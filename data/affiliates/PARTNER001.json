@@ -1,0 +1,44 @@
+{
+  "code": "PARTNER001",
+  "password": "AB123456",
+  "name": "محمد",
+  "active": true,
+  "warrantyDays": 15,
+  "orders": [
+    {
+      "id": "ORDER-001",
+      "product": "برنامج الانجليزي الشامل",
+      "addedAt": "2026-09-01T12:00:00+03:00",
+      "commission": 10,
+      "status": "approved"
+    },
+    {
+      "id": "ORDER-002",
+      "product": "دورة STEP",
+      "addedAt": "2026-08-12T12:00:00+03:00",
+      "commission": 10,
+      "status": "approved"
+    },
+
+    {
+      "id": "ORDER-002",
+      "product": "دورة STEP",
+      "addedAt": "2026-08-12T12:00:00+03:00",
+      "commission": 10,
+      "status": "approved"
+    }
+  ],
+  "transfers": [
+
+    {
+    "date": "2026-10-12",
+    "amount": 0
+  },
+
+     {
+    "date": "2026-10-12",
+    "amount": 0
+  }
+
+  ]
+}

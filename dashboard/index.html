@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F6F2">
+  <title>لوحة الشريك | Yazeed English</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <div class="header-side"><button class="theme-btn" type="button" data-theme-toggle aria-label="تفعيل الوضع الداكن">☾</button></div>
+    <div class="header-actions">
+      <button class="logout-button" type="button" data-logout>تسجيل الخروج</button>
+      <a class="brand" href="./" aria-label="Yazeed English">
+        <img class="brand-logo" src="https://file.yazeedenglish.com/logo.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+        <span class="brand-logo-fallback" hidden>Y</span>
+        <span class="brand-text"><strong>Yazeed English</strong><span>بوابة الشركاء</span></span>
+      </a>
+    </div>
+  </header>
+
+  <main class="main-website">
+    <section class="dashboard-welcome">
+      <span class="eyebrow">PARTNER DASHBOARD</span>
+      <h1>لوحة الشريك — أهلاً، <span id="partnerName">...</span></h1>
+      <p>بارك الله في رزقك وسعيك.</p>
+    </section>
+
+    <section class="stats-grid" aria-label="إحصائيات الشريك">
+      <article class="stat-card">
+        <div class="stat-top"><span class="stat-label">إجمالي المبيعات</span><span class="stat-icon">▤</span></div>
+        <div class="stat-value" id="totalSales">—</div>
+        <div class="stat-foot">عدد الطلبات المؤهلة للظهور</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-top"><span class="stat-label">إجمالي العمولات المحوّلة</span><span class="stat-icon green">↗</span></div>
+        <div class="stat-value" id="transferredTotal">—</div>
+        <div class="stat-foot">إجمالي الحوالات المسجلة</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-top"><span class="stat-label">الرصيد المتاح</span><span class="stat-icon green">ر.س</span></div>
+        <div class="stat-value" id="availableBalance">—</div>
+        <div class="stat-foot">العمولات المؤهلة بعد خصم الحوالات</div>
+      </article>
+    </section>
+
+    <section class="content-panel" aria-labelledby="ordersHeading">
+      <div class="panel-heading">
+        <div><h2 id="ordersHeading">الطلبات</h2><p>تظهر الطلبات بعد انتهاء فترة الضمان الذهبي.</p></div>
+        <span class="count-pill" id="ordersCount">0</span>
+      </div>
+      <div id="ordersContent"><div class="loading-state">جارٍ تحميل الطلبات...</div></div>
+    </section>
+
+    <section class="content-panel" aria-labelledby="transfersHeading">
+      <div class="panel-heading">
+        <div><h2 id="transfersHeading">سجل الحوالات</h2><p>سجل مبالغ التحويلات البنكية السابقة.</p></div>
+        <span class="count-pill" id="transfersCount">0</span>
+      </div>
+      <div id="transfersContent"><div class="loading-state">جارٍ تحميل الحوالات...</div></div>
+    </section>
+    <div id="dashboardMessage" class="demo-note" hidden></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <nav class="footer-links" aria-label="روابط التذييل">
+      <a href="../pages/support.html">دعم الشركاء</a>
+      <a href="../pages/faq.html">الأسئلة الشائعة</a>
+      <a href="../pages/policy.html">سياسة الشركاء</a>
+    </nav>
+    <p>© <span data-current-year></span> Yazeed English. جميع الحقوق محفوظة.</p>
+  </footer>
+  <script src="../js/common.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

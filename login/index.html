@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F6F2">
+  <title>تسجيل دخول الشركاء | Yazeed English</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="top-header">
+    <div class="header-side">
+      <button class="theme-btn" type="button" data-theme-toggle aria-label="تفعيل الوضع الداكن">☾</button>
+    </div>
+    <a class="brand" href="./" aria-label="Yazeed English">
+      <img class="brand-logo" src="https://file.yazeedenglish.com/logo.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+      <span class="brand-logo-fallback" hidden>Y</span>
+      <span class="brand-text"><strong>Yazeed English</strong><span>بوابة الشركاء</span></span>
+    </a>
+  </header>
+
+  <main class="login-shell">
+    <section class="login-card">
+      <div class="login-mark" aria-hidden="true">↗</div>
+      <span class="eyebrow">PARTNER PORTAL</span>
+      <h1>مرحبًا بعودتك</h1>
+      <p class="muted">سجّل دخولك للاطلاع على مبيعاتك وعمولاتك وسجل الحوالات.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="affiliateCode">رمز الشريك</label>
+          <input id="affiliateCode" name="affiliateCode" type="text" autocomplete="username" placeholder="أدخل رمز الشريك" required maxlength="40" autocapitalize="characters">
+        </div>
+        <div class="field">
+          <label for="affiliatePassword">كلمة المرور</label>
+          <input id="affiliatePassword" name="affiliatePassword" type="password" autocomplete="current-password" placeholder="كلمة المرور من 8 أحرف" required minlength="8" maxlength="8">
+        </div>
+        <button class="primary-btn login-submit" type="submit">تسجيل الدخول <span aria-hidden="true">←</span></button>
+        <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+      </form>
+      <div class="demo-note">للتجربة الأولية فقط: رمز الشريك <strong>PARTNER001</strong> وكلمة المرور <strong>AB123456</strong>. غيّر بيانات المثال قبل نشر المشروع.</div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-line"></div>
+    <nav class="footer-links" aria-label="روابط التذييل">
+      <a href="../pages/support.html">دعم الشركاء</a>
+      <a href="../pages/faq.html">الأسئلة الشائعة</a>
+      <a href="../pages/policy.html">سياسة الشركاء</a>
+    </nav>
+    <p>© <span data-current-year></span> Yazeed English. جميع الحقوق محفوظة.</p>
+  </footer>
+  <script src="../js/common.js"></script>
+  <script src="../js/login.js"></script>
+</body>
+</html>
