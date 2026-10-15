@@ -40,15 +40,52 @@ a { color: inherit; text-decoration: none; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font-size: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgba(0, 104, 155, .25); outline-offset: 2px; }
+
+
 .top-header {
-  min-height: 77px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
-  padding: 15px 35px; border-bottom: 1px solid var(--line); background: var(--card);
+  min-height: 77px;
+  display: flex;
+  flex-direction: row;
+  direction: ltr;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 35px;
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+
 }
-.header-side { display: flex; align-items: center; gap: 12px; }
-.brand { display: flex; align-items: center; gap: 12px; }
+
+.header-side {
+  display: flex;
+  flex-direction: row;
+  direction: ltr;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  flex-direction: row-reverse;
+  direction: ltr;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .brand-logo { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; }
 .brand-logo-fallback { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--indigo); color: white; font-size: 20px; font-weight: 900; }
-.brand-text { display: flex; flex-direction: column; gap: 1px; }
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1px;
+}
+
 .brand-text strong { font-size: 15px; font-weight: 900; }
 .brand-text span { color: var(--ink-soft); font-size: 11px; }
 .theme-btn, .icon-btn {
@@ -135,7 +172,16 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   .main-website { padding: 28px 18px 45px; }
 }
 @media (max-width: 520px) {
-  .top-header { padding: 13px 14px; }
+
+  .top-header {
+  padding: 13px 14px;
+  gap: 8px;
+}
+
+.header-side {
+  gap: 7px;
+}
+
   .brand { gap: 9px; }
   .brand-logo, .brand-logo-fallback { width: 37px; height: 37px; }
   .brand-text strong { font-size: 13px; }

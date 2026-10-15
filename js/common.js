@@ -6,7 +6,7 @@
     document.body.classList.toggle("dark", theme === "dark");
     const button = document.querySelector("[data-theme-toggle]");
     if (button) {
-      button.textContent = theme === "dark" ? "☀" : "☾";
+      button.textContent = theme === "dark" ? "☀️" : "🌙";
       button.setAttribute("aria-label", theme === "dark" ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن");
       button.title = theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن";
     }
@@ -35,13 +35,13 @@
   }
 
   function formatMoney(value) {
-    return new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR", maximumFractionDigits: 2 }).format(Number(value) || 0);
+    return new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR", maximumFractionDigits: 2 }).format(Number(value) || 0);
   }
 
   function formatDate(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
-    return new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "short", day: "numeric" }).format(date);
+    return new Intl.DateTimeFormat("en-SA", { year: "numeric", month: "short", day: "numeric" }).format(date);
   }
 
   function getSession() {

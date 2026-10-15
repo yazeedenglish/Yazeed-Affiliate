@@ -17,7 +17,7 @@
     const password = passwordInput.value;
 
     if (!/^[A-Z0-9_-]{3,40}$/.test(code)) {
-      showMessage("تحقق من رمز الشريك وحاول مرة أخرى.", "error");
+      showMessage("تحقق من رمز الشريك وحاول مرة أخرى", "error");
       return;
     }
     if (password.length !== 8) {
@@ -38,7 +38,7 @@
       localStorage.setItem(window.YEAffiliate.SESSION_KEY, JSON.stringify({ code: partner.code, loggedInAt: new Date().toISOString() }));
       window.location.href = "../dashboard/";
     } catch (_) {
-      showMessage("تعذر تسجيل الدخول. تحقق من الرمز وكلمة المرور.", "error");
+      showMessage("تعذر تسجيل الدخول. تحقق من الرمز وكلمة المرور", "error");
     } finally {
       submit.disabled = false;
       submit.innerHTML = 'تسجيل الدخول <span aria-hidden="true">←</span>';

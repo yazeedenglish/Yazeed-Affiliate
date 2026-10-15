@@ -15,20 +15,20 @@
   function renderOrders(orders) {
     $("ordersCount").textContent = String(orders.length);
     if (!orders.length) {
-      $("ordersContent").innerHTML = emptyState("▤", "لا توجد طلبات حتى الآن", "ستظهر طلباتك هنا بعد انتهاء فترة الضمان الذهبي.");
+      $("ordersContent").innerHTML = emptyState("▤", "لا توجد طلبات حتى الآن", "ستظهر طلباتك هنا بعد انتهاء فترة الضمان الذهبي");
       return;
     }
     const rows = orders.map((order) => {
-      const status = order.status === "refunded" ? '<span class="status-pill refunded">مسترجع</span>' : '<span class="status-pill">مكتمل الضمان</span>';
+      const status = order.status === "refunded" ? '<span class="status-pill refunded">مسترجع</span>' : '<span class="status-pill">مكتمل</span>';
       return `<tr><td>${window.YEAffiliate.escapeHtml(order.product || "منتج")}</td><td>${window.YEAffiliate.formatDate(order.addedAt)}</td><td class="amount">${window.YEAffiliate.formatMoney(order.commission)}</td><td>${status}</td></tr>`;
     }).join("");
-    $("ordersContent").innerHTML = `<div class="table-wrap"><table class="data-table"><thead><tr><th>المنتج</th><th>تاريخ تسجيل الطلب</th><th>العمولة</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    $("ordersContent").innerHTML = `<div class="table-wrap"><table class="data-table"><thead><tr><th>المنتج</th><th>تاريخ الطلب</th><th>العمولة</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function renderTransfers(transfers) {
     $("transfersCount").textContent = String(transfers.length);
     if (!transfers.length) {
-      $("transfersContent").innerHTML = emptyState("↔", "لا توجد حوالات حتى الآن", "ستظهر هنا تواريخ ومبالغ الحوالات البنكية التي تم تسجيلها.");
+      $("transfersContent").innerHTML = emptyState("↔", "لا توجد حوالات حتى الآن", "ستظهر هنا تواريخ ومبالغ الحوالات البنكية التي تم تسجيلها");
       return;
     }
     const rows = transfers.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).map((transfer) =>
@@ -65,18 +65,18 @@
       const transferredTotal = transfers.reduce((sum, transfer) => sum + Math.max(0, Number(transfer.amount) || 0), 0);
       const availableBalance = Math.max(0, eligibleCommission - transferredTotal);
 
-      $("totalSales").textContent = new Intl.NumberFormat("ar-SA").format(eligibleOrders.length);
+      $("totalSales").textContent = new Intl.NumberFormat("en-SA").format(eligibleOrders.length);
       $("transferredTotal").textContent = window.YEAffiliate.formatMoney(transferredTotal);
       $("availableBalance").textContent = window.YEAffiliate.formatMoney(availableBalance);
       renderOrders(eligibleOrders);
       renderTransfers(transfers);
     } catch (_) {
       $("partnerName").textContent = "الشريك";
-      $("ordersContent").innerHTML = emptyState("!", "تعذر تحميل البيانات", "تحقق من وجود ملف JSON للشريك وصحة تنسيقه.");
+      $("ordersContent").innerHTML = emptyState("!", "تعذر تحميل البيانات", "تحقق من وجود ملف JSON للشريك وصحة تنسيقه");
       $("transfersContent").innerHTML = "";
       const note = $("dashboardMessage");
       note.hidden = false;
-      note.textContent = "تعذر تحميل ملف بيانات الشريك. تأكد من تشغيل الموقع عبر استضافة أو خادم محلي يدعم fetch، وليس بفتح ملف HTML مباشرة.";
+      note.textContent = "تعذر تحميل ملف بيانات الشريك. تأكد من تشغيل الموقع عبر استضافة أو خادم محلي يدعم fetch، وليس بفتح ملف HTML مباشرة";
     }
   }
 
