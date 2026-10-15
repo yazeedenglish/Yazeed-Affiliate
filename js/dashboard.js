@@ -12,18 +12,105 @@
     return `<div class="empty-state"><div class="empty-icon" aria-hidden="true">${icon}</div><strong>${window.YEAffiliate.escapeHtml(title)}</strong><p>${window.YEAffiliate.escapeHtml(description)}</p></div>`;
   }
 
-  function renderOrders(orders) {
-    $("ordersCount").textContent = String(orders.length);
-    if (!orders.length) {
-      $("ordersContent").innerHTML = emptyState("▤", "لا توجد طلبات حتى الآن", "ستظهر طلباتك هنا بعد انتهاء فترة الضمان الذهبي");
-      return;
-    }
-    const rows = orders.map((order) => {
-      const status = order.status === "refunded" ? '<span class="status-pill refunded">مسترجع</span>' : '<span class="status-pill">مكتمل</span>';
-      return `<tr><td>${window.YEAffiliate.escapeHtml(order.product || "منتج")}</td><td>${window.YEAffiliate.formatDate(order.addedAt)}</td><td class="amount">${window.YEAffiliate.formatMoney(order.commission)}</td><td>${status}</td></tr>`;
-    }).join("");
-    $("ordersContent").innerHTML = `<div class="table-wrap"><table class="data-table"><thead><tr><th>المنتج</th><th>تاريخ الطلب</th><th>العمولة</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+let currentOrdersPage = 1;
+const ordersPerPage = 20;
+
+function renderOrders(orders) {
+  const ordersContent = $("ordersContent");
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  // Keep the current page valid when the number of orders changes.
+  currentOrdersPage = Math.max(1, Math.min(currentOrdersPage, totalPages || 1));
+
+  $("ordersCount").textContent = String(orders.length);
+
+  if (!orders.length) {
+    ordersContent.innerHTML = emptyState(
+      "▤",
+      "لا توجد طلبات حتى الآن",
+      "ستظهر طلباتك هنا بعد انتهاء فترة الضمان الذهبي"
+    );
+    return;
   }
+
+  const startIndex = (currentOrdersPage - 1) * ordersPerPage;
+  const pageOrders = orders.slice(startIndex, startIndex + ordersPerPage);
+
+  const rows = pageOrders.map((order) => {
+    const status =
+      order.status === "refunded"
+        ? '<span class="status-pill refunded">مسترجع</span>'
+        : '<span class="status-pill">مكتمل</span>';
+
+    return `<tr>
+      <td>${window.YEAffiliate.escapeHtml(order.product || "منتج")}</td>
+      <td>${window.YEAffiliate.formatDate(order.addedAt)}</td>
+      <td class="amount">${window.YEAffiliate.formatMoney(order.commission)}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join("");
+
+  let pagination = "";
+
+  if (totalPages > 1) {
+  let pageButtons = "";
+
+  for (let page = totalPages; page >= 1; page--) {
+    pageButtons += `
+      <button
+        type="button"
+        class="page-btn ${page === currentOrdersPage ? "active" : ""}"
+        data-orders-page="${page}"
+        ${page === currentOrdersPage ? 'aria-current="page"' : ""}
+      >${page}</button>`;
+  }
+
+  pagination = `
+    <div class="pagination" aria-label="صفحات الطلبات">
+      <button
+        type="button"
+        class="page-btn"
+        data-orders-page="${currentOrdersPage - 1}"
+        ${currentOrdersPage === 1 ? "disabled" : ""}
+      >السابق</button>
+
+      <span class="page-numbers">${pageButtons}</span>
+
+      <button
+        type="button"
+        class="page-btn"
+        data-orders-page="${currentOrdersPage + 1}"
+        ${currentOrdersPage === totalPages ? "disabled" : ""}
+      >التالي</button>
+    </div>`;
+}
+
+  ordersContent.innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>المنتج</th>
+            <th>تاريخ الطلب</th>
+            <th>العمولة</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${pagination}
+  `;
+
+  ordersContent.querySelectorAll("[data-orders-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.disabled) return;
+
+      currentOrdersPage = Number(button.dataset.ordersPage);
+      renderOrders(orders);
+    });
+  });
+}
 
   function renderTransfers(transfers) {
     $("transfersCount").textContent = String(transfers.length);
