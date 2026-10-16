@@ -1,310 +1,72 @@
 {
-  "code": "PARTNER001",
-  "password": "AB123456",
-  "name": "محمد",
-  "active": true,
-  "warrantyDays": 15,
-  "orders": [
-    {
-      "id": "ORDER-001",
-      "product": "برنامج الانجليزي الشامل",
-      "addedAt": "2026-09-01T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
+    "code": "PARTNER001",
+    "password": "AB123456",
+    "name": "محمد",
+    "active": true,
+    "orders": [
+  {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
 
     {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+    {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+      {
+   "id": "ORDER-001",
+   "productId": "step",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
 
         {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-001",
-      "product": "برنامج الانجليزي الشامل",
-      "addedAt": "2026-09-01T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
+   "id": "ORDER-001",
+   "productId": "step",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
 
           {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-          {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-          {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-          {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-         {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-          {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-    {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-        {
-      "id": "ORDER-002",
-      "product": "دورة STEP",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    },
-
-          {
-      "id": "ORDER-002",
-      "product": "hello",
-      "addedAt": "2026-08-12T12:00:00+03:00",
-      "commission": 10,
-      "status": "approved"
-    }
-
-    
-
-    
+   "id": "ORDER-001",
+   "productId": "step",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  }
+  
   ],
   "transfers": [
 
     {
     "date": "2026-10-12",
-    "amount": 0
-  },
-
-     {
-    "date": "2026-10-12",
-    "amount": 0
+    "amount": 73.80
   }
 
   ]

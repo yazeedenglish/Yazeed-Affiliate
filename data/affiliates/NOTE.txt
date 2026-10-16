@@ -1,0 +1,73 @@
+order template:
+
+{
+   "id": "ORDER-001",
+   "productId": "step",
+   "addedAt": "2026-08-05T12:00:00+03:00",
+    "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  }
+
+
+  -----------------------------------
+
+transfer template:
+
+
+{
+    "date": "2026-10-12",
+    "amount": 199
+  },
+
+
+  -----------------------------------
+
+Full template:
+
+  {
+    "code": "PARTNER001",
+    "password": "AB123456",
+    "name": "محمد",
+    "active": true,
+    "orders": [
+  {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-10-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 29,
+    "commissionRate": 30,
+    "warrantyDays": 0
+  },
+
+  {
+   "id": "ORDER-002",
+   "productId": "step",
+   "addedAt": "2026-08-01T12:00:00+03:00",
+    "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 30
+  }
+    
+  ],
+  "transfers": [
+
+    {
+    "date": "2026-10-12",
+    "amount": 199
+  },
+
+     {
+    "date": "2026-10-12",
+    "amount": 0
+  }
+
+  ]
+}
+
+
+------------------------
+
+"status": "approved", "refunded
+    

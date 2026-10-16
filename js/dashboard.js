@@ -74,7 +74,9 @@ function renderOrders(orders) {
         ${currentOrdersPage === 1 ? "disabled" : ""}
       >السابق</button>
 
-      <span class="page-numbers">${pageButtons}</span>
+      <div class="page-numbers-scroll">
+  <span class="page-numbers">${pageButtons}</span>
+</div>
 
       <button
         type="button"
@@ -124,48 +126,171 @@ function renderOrders(orders) {
     $("transfersContent").innerHTML = `<div class="table-wrap"><table class="data-table"><thead><tr><th>تاريخ الحوالة</th><th>المبلغ المحوّل</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
-  async function init() {
-    try {
-      const response = await fetch(`../data/affiliates/${encodeURIComponent(session.code)}.json`, { cache: "no-store" });
-      if (!response.ok) throw new Error("missing-partner");
-      const partner = await response.json();
-      if (String(partner.code || "").toUpperCase() !== String(session.code).toUpperCase() || partner.active === false) throw new Error("invalid-partner");
+  
+async function init() {
+  try {
+    // Load product definitions
+    const productsResponse = await fetch("../data/affiliates/products.json", {
+      cache: "no-store"
+    });
 
-      $("partnerName").textContent = partner.name || "الشريك";
-      const now = Date.now();
-      const warrantyDays = Number(partner.warrantyDays) || 15;
-      const eligibleOrders = (Array.isArray(partner.orders) ? partner.orders : []).filter((order) => {
-        const addedAt = new Date(order.addedAt).getTime();
-        if (!Number.isFinite(addedAt)) return false;
-        const warrantyEndsAt = addedAt + warrantyDays * 24 * 60 * 60 * 1000;
-        if (now < warrantyEndsAt) return false;
-        // A refund recorded during the warranty excludes the order.
-        // A refund recorded after the warranty does not automatically reverse earned commission.
-        if (order.status === "refunded") {
-          const refundedAt = new Date(order.refundedAt || "").getTime();
-          if (!Number.isFinite(refundedAt) || refundedAt <= warrantyEndsAt) return false;
-        }
-        return true;
-      });
-      const transfers = Array.isArray(partner.transfers) ? partner.transfers : [];
-      const eligibleCommission = eligibleOrders.reduce((sum, order) => sum + (Number(order.commission) || 0), 0);
-      const transferredTotal = transfers.reduce((sum, transfer) => sum + Math.max(0, Number(transfer.amount) || 0), 0);
-      const availableBalance = Math.max(0, eligibleCommission - transferredTotal);
-
-      $("totalSales").textContent = new Intl.NumberFormat("en-SA").format(eligibleOrders.length);
-      $("transferredTotal").textContent = window.YEAffiliate.formatMoney(transferredTotal);
-      $("availableBalance").textContent = window.YEAffiliate.formatMoney(availableBalance);
-      renderOrders(eligibleOrders);
-      renderTransfers(transfers);
-    } catch (_) {
-      $("partnerName").textContent = "الشريك";
-      $("ordersContent").innerHTML = emptyState("!", "تعذر تحميل البيانات", "تحقق من وجود ملف JSON للشريك وصحة تنسيقه");
-      $("transfersContent").innerHTML = "";
-      const note = $("dashboardMessage");
-      note.hidden = false;
-      note.textContent = "تعذر تحميل ملف بيانات الشريك. تأكد من تشغيل الموقع عبر استضافة أو خادم محلي يدعم fetch، وليس بفتح ملف HTML مباشرة";
+    if (!productsResponse.ok) {
+      throw new Error("Could not load products.json");
     }
+
+    const products = await productsResponse.json();
+
+    // Load partner data
+    const response = await fetch(
+      `../data/affiliates/${encodeURIComponent(session.code)}.json`,
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not load partner JSON");
+    }
+
+    const partner = await response.json();
+
+    if (
+      String(partner.code || "").toUpperCase() !==
+        String(session.code).toUpperCase() ||
+      partner.active === false
+    ) {
+      throw new Error("Invalid or inactive partner");
+    }
+
+    $("partnerName").textContent = partner.name || "الشريك";
+
+    const now = Date.now();
+
+    // Filter orders using the existing warranty and refund rules
+    const eligibleOrders = (
+      Array.isArray(partner.orders) ? partner.orders : []
+    )
+      .filter((order) => {
+        const addedAt = new Date(order.addedAt).getTime();
+
+        if (!Number.isFinite(addedAt)) return false;
+
+        const warrantyDays = Number(order.warrantyDays ?? 15);
+const warrantyEndsAt = addedAt + warrantyDays * 24 * 60 * 60 * 1000;
+
+        if (now < warrantyEndsAt) return false;
+
+        // Refunds during the warranty period exclude the order.
+        // Refunds after the warranty do not automatically reverse commission.
+        if (order.status === "refunded") {
+          const refundedAt = new Date(
+            order.refundedAt || ""
+          ).getTime();
+
+          if (
+            !Number.isFinite(refundedAt) ||
+            refundedAt <= warrantyEndsAt
+          ) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .map((order) => {
+        // Find the product using its ID in products.json
+        const product = products[order.productId];
+
+        // Use the recorded sale price when provided.
+        // Otherwise, use the product's price from products.json.
+        const hasSalePrice =
+          order.salePrice !== undefined &&
+          order.salePrice !== null &&
+          order.salePrice !== "";
+
+        const salePrice = hasSalePrice
+          ? Number(order.salePrice)
+          : Number(product?.price);
+
+        if (
+          !product ||
+          !Number.isFinite(salePrice) ||
+          salePrice < 0
+        ) {
+          throw new Error(
+            `Invalid product or sale price: ${order.productId}`
+          );
+        }
+
+        // Calculate commission as a percentage
+        const orderCommissionRate = Number(order.commissionRate ?? 0);
+const commission = Number(
+  (salePrice * orderCommissionRate / 100).toFixed(2)
+);
+
+        return {
+          ...order,
+          product: product.name || "منتج",
+          commission
+        };
+      });
+
+    // Load recorded bank transfers
+    const transfers = Array.isArray(partner.transfers)
+      ? partner.transfers
+      : [];
+
+    // Calculate the total earned commission
+    const eligibleCommission = eligibleOrders.reduce(
+      (sum, order) => sum + order.commission,
+      0
+    );
+
+    // Subtract transfers from the available balance
+    const transferredTotal = transfers.reduce(
+      (sum, transfer) =>
+        sum + Math.max(0, Number(transfer.amount) || 0),
+      0
+    );
+
+    const availableBalance = Math.max(
+      0,
+      eligibleCommission - transferredTotal
+    );
+
+    // Update dashboard figures
+    $("totalSales").textContent = new Intl.NumberFormat(
+      "en-SA"
+    ).format(eligibleOrders.length);
+
+    $("transferredTotal").textContent =
+      window.YEAffiliate.formatMoney(transferredTotal);
+
+    $("availableBalance").textContent =
+      window.YEAffiliate.formatMoney(availableBalance);
+
+    // Keep your existing pagination and table rendering
+    renderOrders(eligibleOrders);
+    renderTransfers(transfers);
+
+  } catch (error) {
+    console.error("Dashboard loading error:", error);
+
+    $("partnerName").textContent = "الشريك";
+
+    $("ordersContent").innerHTML = emptyState(
+      "!",
+      "تعذر تحميل البيانات",
+      "تحقق من ملفات المنتجات وبيانات الشريك وتطابق معرفات المنتجات"
+    );
+
+    $("transfersContent").innerHTML = "";
+
+    const note = $("dashboardMessage");
+    note.hidden = false;
+    note.textContent =
+      "تعذر تحميل البيانات. تحقق من وجود products.json وملف الشريك الصحيح، ومن تطابق productId مع معرف المنتج.";
   }
+}
+
 
   init();
 })();

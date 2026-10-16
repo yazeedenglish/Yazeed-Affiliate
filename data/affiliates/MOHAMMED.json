@@ -1,0 +1,51 @@
+{
+    "code": "MOHAMMED",
+    "password": "YZ123456",
+    "name": "يزيد",
+    "active": true,
+    "orders": [
+  {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+   {
+   "id": "ORDER-001",
+   "productId": "step",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+     {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  }
+  
+  ],
+  "transfers": [
+
+    {
+    "date": "2026-10-12",
+    "amount": 14.70
+  },
+
+      {
+    "date": "2026-10-12",
+    "amount": 29.40
+  }
+
+  ]
+}

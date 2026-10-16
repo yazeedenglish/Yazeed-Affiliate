@@ -207,6 +207,18 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   margin: 16px 20px 20px;
   padding: 8px 0;
   box-sizing: border-box;
+  max-width: 100%;
+}
+
+.page-numbers-scroll {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(420px, calc(100vw - 160px));
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  padding: 4px 0;
 }
 
 .page-btn {
@@ -252,6 +264,8 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .page-numbers {
   display: flex;
   flex-direction: row;
-  gap: 6px;
   direction: ltr;
+  gap: 6px;
+  width: max-content;
+  flex-wrap: nowrap;
 }
