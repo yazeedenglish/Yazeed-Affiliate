@@ -12,22 +12,30 @@
 </head>
 <body>
   <header class="top-header">
-    <div class="header-side">
-      <button class="theme-btn" type="button" data-theme-toggle aria-label="تفعيل الوضع الداكن">☾</button>
-    </div>
-    <a class="brand" href="./" aria-label="Yazeed English">
-      <img class="brand-logo" src="https://file.yazeedenglish.com/logo.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
-      <span class="brand-logo-fallback" hidden>Y</span>
-      <span class="brand-text"><strong>Yazeed English</strong><span>بوابة الشركاء</span></span>
-    </a>
-  </header>
+  <div class="header-side">
+    <button class="theme-btn" type="button" data-theme-toggle aria-label="تفعيل الوضع الداكن">☾</button>
+  </div>
+
+  <a class="brand" href="./" aria-label="Yazeed English">
+    <img
+      class="brand-logo"
+      src="https://file.yazeedenglish.com/logo.png"
+      alt="Yazeed English"
+      onerror="this.hidden=true"
+    >
+    <span class="brand-text">
+      <strong>Yazeed English</strong>
+      <span>بوابة الشركاء</span>
+    </span>
+  </a>
+</header>
 
   <main class="login-shell">
     <section class="login-card">
-      <div class="login-mark" aria-hidden="true">↗</div>
+      <div class="login-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check preview-icon"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <span class="eyebrow">PARTNER PORTAL</span>
-      <h1>مرحبًا بعودتك</h1>
-      <p class="muted">سجّل دخولك للاطلاع على مبيعاتك وعمولاتك وسجل الحوالات.</p>
+      <h1>تسجيل الدخول</h1>
+      <p class="muted">سجّل دخولك للاطلاع على المبيعات والأرباح</p>
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="affiliateCode">رمز الشريك</label>
@@ -35,12 +43,12 @@
         </div>
         <div class="field">
           <label for="affiliatePassword">كلمة المرور</label>
-          <input id="affiliatePassword" name="affiliatePassword" type="password" autocomplete="current-password" placeholder="كلمة المرور من 8 أحرف" required minlength="8" maxlength="8">
+          <input id="affiliatePassword" name="affiliatePassword" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required minlength="8" maxlength="8">
         </div>
         <button class="primary-btn login-submit" type="submit">تسجيل الدخول <span aria-hidden="true">←</span></button>
         <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
       </form>
-      <div class="demo-note">للتجربة الأولية فقط: رمز الشريك <strong>PARTNER001</strong> وكلمة المرور <strong>AB123456</strong>. غيّر بيانات المثال قبل نشر المشروع.</div>
+      <div class="demo-note"><strog>في حال نسيت بيانات الدخول يرجى التواصل مع دعم الشركاء</strong></div>
     </section>
   </main>
 
@@ -51,7 +59,7 @@
       <a href="../pages/faq.html">الأسئلة الشائعة</a>
       <a href="../pages/policy.html">سياسة الشركاء</a>
     </nav>
-    <p>© <span data-current-year></span> Yazeed English. جميع الحقوق محفوظة.</p>
+    <p>© <span data-current-year></span> Yazeed English</p>
   </footer>
   <script src="../js/common.js"></script>
   <script src="../js/login.js"></script>

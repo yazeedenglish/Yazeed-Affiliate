@@ -17,11 +17,11 @@
     const password = passwordInput.value;
 
     if (!/^[A-Z0-9_-]{3,40}$/.test(code)) {
-      showMessage("تحقق من رمز الشريك وحاول مرة أخرى", "error");
+      showMessage("بيانات الدخول غير صحيحة", "error");
       return;
     }
     if (password.length !== 8) {
-      showMessage("يجب أن تتكون كلمة المرور من 8 أحرف بالضبط.", "error");
+      showMessage("بيانات الدخول غير صحيحة", "error");
       return;
     }
 
