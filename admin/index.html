@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F6F2">
+  <title>لوحة الإدارة | Yazeed English</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="admin.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Yazeed English">
+    <img
+      class="brand-logo"
+      src="https://file.yazeedenglish.com/logo.png"
+      alt="Yazeed English"
+      onerror="this.hidden=true"
+    >
+    <span class="brand-text">
+      <strong>Yazeed English</strong>
+      <span>برنامج الشركاء</span>
+    </span>
+  </a>
+      <div class="top-actions">
+        <span class="local-badge"><span></span> معالجة محلية</span>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="تغيير المظهر" title="تغيير المظهر">◐</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="welcome-row">
+        <div>
+          <p class="eyebrow">نظرة عامة على الأداء</p>
+          <h1>لوحة تحكم الشركاء</h1>
+          <p class="subheading">تابع المبيعات والعمولات وترتيب أفضل الشركاء في مكان واحد.</p>
+        </div>
+        <div class="period-controls">
+          <label for="periodType">الفترة</label>
+          <select id="periodType"><option value="month">Month</option><option value="year">Year</option><option value="all">All</option></select>
+          <select id="periodValue" aria-label="اختيار الشهر أو السنة"></select>
+        </div>
+      </section>
+
+      <section class="import-panel" aria-labelledby="importTitle">
+        <div class="import-copy">
+          <div class="section-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-chart-column preview-icon"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M8 18v-1"/><path d="M12 18v-6"/><path d="M16 18v-3"/></svg></div>
+          <div><h2 id="importTitle">بيانات المشروع</h2><p>يتم تحميل ملفات الشركاء وملف المنتجات تلقائيًا من مجلد data عند فتح الصفحة</p></div>
+        </div>
+        <div class="import-controls">
+          <button id="refreshData" class="file-button" type="button">تحديث البيانات</button>
+        </div>
+        <p class="import-status" id="importStatus" role="status">جارٍ الاتصال بملفات المشروع…</p>
+
+      </section>
+
+      <section class="stats-grid" aria-label="ملخص الإحصائيات">
+        <article class="stat-card"><div class="stat-top"><span>الشركاء النشطون</span><span class="stat-icon blue">♙</span></div><strong id="activePartners">—</strong><small id="partnerCountHint">من إجمالي الشركاء</small></article>
+        <article class="stat-card"><div class="stat-top"><span>الطلبات المعتمدة</span><span class="stat-icon violet">▤</span></div><strong id="totalOrders">—</strong><small>ضمن الفترة المحددة</small></article>
+        <article class="stat-card"><div class="stat-top"><span>إجمالي المبيعات</span><span class="stat-icon green">↗</span></div><strong id="totalSales">—</strong><small>قيمة الطلبات المعتمدة</small></article>
+        <article class="stat-card">
+  <div class="stat-top">
+    <span>أرباح المتجر</span>
+    <span class="stat-icon blue">ر.س</span>
+  </div>
+  <strong id="storeProfit">—</strong>
+  <small>المبيعات ناقص إجمالي العمولات</small>
+</article>
+        <article class="stat-card"><div class="stat-top"><span>العمولات بعد الضمان</span><span class="stat-icon amber">ر.س</span></div><strong id="earnedCommission">—</strong><small>للطلبات التي انتهت فترة ضمانها</small></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel ranking-panel">
+          <div class="panel-heading"><div><p class="eyebrow">الأداء</p><h2>ترتيب الشركاء</h2></div><span class="panel-tag" id="rankingCount">0 شركاء</span></div>
+          <div class="table-wrap"><table><thead><tr><th>الترتيب</th><th>الشريك</th><th>الطلبات</th><th>المبيعات</th><th>العمولات بعد الضمان</th></tr></thead><tbody id="rankingBody"><tr><td colspan="5" class="empty-cell">حمّل ملفات JSON لعرض الترتيب.</td></tr></tbody></table></div>
+        </article>
+        <article class="panel product-panel">
+          <div class="panel-heading"><div><p class="eyebrow">الأكثر مبيعًا</p><h2>أداء المنتجات</h2></div></div>
+          <div id="productPerformance" class="product-list"><p class="empty-state">ستظهر المنتجات بعد تحميل البيانات.</p></div>
+        </article>
+      </section>
+
+      <section class="panel orders-panel">
+        <div class="panel-heading"><div><p class="eyebrow">آخر النشاط</p><h2>أحدث الطلبات</h2></div><span class="panel-tag" id="ordersCount">0 طلبات</span></div>
+        <div class="table-wrap"><table><thead><tr><th>رقم الطلب</th><th>الشريك</th><th>المنتج</th><th>التاريخ</th><th>قيمة البيع</th><th>العمولة</th><th>الحالة</th></tr></thead><tbody id="ordersBody"><tr><td colspan="7" class="empty-cell">لا توجد بيانات للعرض.</td></tr></tbody></table></div>
+      </section>
+      <footer class="footer"><span>Yazeed English © <span id="currentYear"></span></span></footer>
+    </main>
+  </div>
+</body>
+</html>
