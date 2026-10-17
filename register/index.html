@@ -110,7 +110,7 @@
                 الاسم الأول <span>*</span>
               </label>
               <input type="text" id="firstName" name="الاسم الأول"
-                placeholder=""
+                placeholder="أدخل اسمك الأول"
                 autocomplete="given-name" required>
             </div>
 
@@ -119,7 +119,7 @@
                 الاسم الأخير <span>*</span>
               </label>
               <input type="text" id="lastName" name="الاسم الأخير"
-                placeholder=""
+                placeholder="أدخل اسمك الأخير"
                 autocomplete="family-name" required>
             </div>
 
@@ -139,16 +139,19 @@
 
             <div class="field field-full">
               <label for="marketingCode">
-                ما هو كودك التسويقي الذي تفضّله؟
-              </label>
+  ما هو كودك التسويقي الذي تفضّله؟ <span>*</span>
+</label>
               <input type="text" id="marketingCode"
                 name="الكود التسويقي المفضل"
                 placeholder="مثال: YZD5"
-                maxlength="30"
+                 minlength="3"
+                maxlength="6"
+                 pattern="[A-Za-z0-9]{3,6}"
                 autocomplete="off"
+                required
                 aria-describedby="codeHint">
               <small id="codeHint" class="field-hint">
-                اختر كودًا قصيرًا وسهل التذكر. سنراجع توفره قبل اعتماده.
+                اختر كودًا قصيرًا وسهل التذكر
               </small>
             </div>
           </div>
