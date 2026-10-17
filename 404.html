@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>الصفحة غير موجودة | Yazeed English</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root {
+            --paper: #F5F6F2;
+            --ink: #00273a;
+            --ink-soft: #5B645F;
+            --indigo: #00689b;
+            --card: #FFFFFF;
+            --line: #DCDFD6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+
+            font-family: "Tajawal", sans-serif;
+
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .error-box {
+            width: 100%;
+            max-width: 500px;
+
+            padding: 45px 30px;
+
+            text-align: center;
+
+            background: var(--card);
+
+            border: 1px solid var(--line);
+
+            border-radius: 24px;
+
+            box-shadow:
+                0 20px 60px rgba(0, 39, 58, 0.08);
+        }
+
+        .error-number {
+            font-size: 70px;
+            font-weight: 900;
+            color: var(--indigo);
+
+            line-height: 1;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        p {
+            margin: 0 auto 25px;
+
+            max-width: 400px;
+
+            color: var(--ink-soft);
+
+            line-height: 1.8;
+
+            font-size: 14px;
+        }
+
+        .home-btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 13px 25px;
+
+            background: var(--indigo);
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 11px;
+
+            font-family: inherit;
+            font-weight: 800;
+
+            transition: 0.2s;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="error-box">
+
+        <div class="error-number">
+            404
+        </div>
+
+        <h1>
+            الصفحة غير موجودة
+        </h1>
+
+        <p>
+            عذرًا، يبدو أن الصفحة التي تبحث عنها
+            غير موجودة أو أن الرابط غير صحيح.
+        </p>
+
+        <a
+            href="/"
+            class="home-btn"
+        >
+            العودة إلى الصفحة الرئيسية
+        </a>
+
+    </main>
+
+</body>
+
+</html>
