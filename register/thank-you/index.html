@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>تم استلام طلبك | Yazeed English</title>
+  <meta name="description" content="تم استلام طلب الانضمام إلى برنامج شركاء Yazeed English">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    .thank-you-page {
+      min-height: 65vh;
+      display: grid;
+      place-items: center;
+      padding: 48px 20px;
+    }
+
+    .thank-you-card {
+      width: 100%;
+      max-width: 560px;
+      padding: 40px 28px;
+      text-align: center;
+      background: var(--card, #FFFFFF);
+      border: 1px solid var(--line, #DCDFD6);
+      border-radius: 20px;
+    }
+
+    .success-icon {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 24px;
+      color: #15803d;
+      background: rgba(21, 128, 61, 0.10);
+      border-radius: 50%;
+    }
+
+    .success-icon svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .thank-you-card h1 {
+      margin: 0 0 14px;
+      color: var(--ink, #00273a);
+      font-size: clamp(25px, 5vw, 32px);
+      font-weight: 800;
+    }
+
+    .thank-you-card p {
+      margin: 0 auto 12px;
+      max-width: 420px;
+      color: var(--ink-soft, #5B645F);
+      font-size: 16px;
+      line-height: 1.9;
+    }
+
+    .thank-you-note {
+      margin-top: 24px;
+      padding: 14px 16px;
+      color: var(--ink-soft, #5B645F);
+      background: var(--paper, #F5F6F2);
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .thank-you-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .thank-you-actions a {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 22px;
+      border: 1px solid var(--indigo, #00689b);
+      border-radius: 10px;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .thank-you-actions a:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    .primary-link {
+      color: #FFFFFF;
+      background: var(--course-button, #00689b);
+    }
+
+    .secondary-link {
+      color: var(--indigo, #00689b);
+      background: transparent;
+    }
+
+    body.dark .success-icon {
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.12);
+    }
+
+    @media (max-width: 480px) {
+      .thank-you-card {
+        padding: 32px 20px;
+      }
+
+      .thank-you-actions {
+        flex-direction: column;
+      }
+
+      .thank-you-actions a {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .thank-you-actions a {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  
+
+  <main class="thank-you-page">
+    <section class="thank-you-card" aria-labelledby="thankYouTitle">
+      <div class="success-icon" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+      </div>
+
+      <h1 id="thankYouTitle">تم استلام طلبك بنجاح</h1>
+
+      <p>
+        شكرًا لاهتمامك بالانضمام إلى برنامج شركاء
+        <strong>Yazeed English</strong>
+      </p>
+
+      <p>
+        وصلنا طلبك، وسيتم مراجعته والتواصل معك في أقرب وقت
+      </p>
+
+      <div class="thank-you-note">
+        <strong>ما الخطوة التالية؟</strong><br>
+        يرجى متابعة بريدك الإلكتروني للتأكد من عدم تفويت أي تحديث يتعلق بطلبك.
+      </div>
+
+      <div class="thank-you-actions">
+        <a class="primary-link" href="/">العودة للرئيسية</a>
+        <a class="secondary-link" href="/support/">تواصل مع الدعم</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    let theme = "light";
+
+    try {
+      theme = localStorage.getItem("ye_affiliate_theme") || "light";
+    } catch (error) {
+      // Use the default light theme.
+    }
+
+    document.body.classList.toggle("dark", theme === "dark");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</body>
+</html>
