@@ -95,6 +95,61 @@
       </article>
     </section>
 
+    <section class="content-panel performance-panel" aria-labelledby="performanceHeading">
+  <div class="panel-heading">
+    <div>
+      <h2 id="performanceHeading">مؤشر الأداء</h2>
+      <p>تابع أداءك وإجمالي عمولاتك خلال الفترة المحددة</p>
+    </div>
+    <span class="performance-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/>
+        <path d="m19 9-5 5-4-4-5 5"/>
+      </svg>
+    </span>
+  </div>
+
+  <div class="performance-filters">
+    <label for="performancePeriod">الفترة</label>
+    <select id="performancePeriod">
+      <option value="month">شهري</option>
+      <option value="year">سنوي</option>
+      <option value="all">الكل</option>
+    </select>
+
+    <select id="performanceMonth" aria-label="اختر الشهر"></select>
+    <select id="performanceYear" aria-label="اختر السنة" hidden></select>
+  </div>
+
+  <div class="performance-kpis">
+    <article class="performance-kpi">
+      <span>إجمالي الطلبات</span>
+      <strong id="performanceOrders">0</strong>
+      <small>طلب</small>
+    </article>
+
+    <article class="performance-kpi">
+      <span>إجمالي العمولات</span>
+      <strong id="performanceCommission">0 ر.س</strong>
+      <small>حسب الفترة المحددة</small>
+    </article>
+
+    <article class="performance-kpi">
+      <span>متوسط العمولة</span>
+      <strong id="performanceAverage">0 ر.س</strong>
+      <small>لكل طلب مؤهل</small>
+    </article>
+  </div>
+
+  <div class="performance-chart-section">
+    <div class="performance-chart-heading">
+      <h3 id="performanceChartTitle">نشاط الطلبات</h3>
+      <span id="performanceChartCaption"></span>
+    </div>
+    <div id="performanceChart" class="performance-chart"></div>
+  </div>
+</section>
+
     <section class="content-panel" aria-labelledby="ordersHeading">
       <div class="panel-heading">
         <div><h2 id="ordersHeading">الطلبات</h2><p>تظهر الطلبات بعد انتهاء فترة الضمان الذهبي</p></div>

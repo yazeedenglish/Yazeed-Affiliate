@@ -384,3 +384,339 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
         font-size: 17px;
     }
 }
+
+/* Performance Dashboard */
+.performance-panel {
+  margin-top: 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: var(--card);
+}
+
+.performance-panel .panel-heading {
+  padding: 21px 23px;
+  border-bottom: 1px solid var(--line);
+}
+
+.performance-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: rgba(0, 104, 155, .10);
+  color: var(--course-button);
+}
+
+.performance-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 23px 0;
+}
+
+.performance-filters label {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.performance-filters select {
+  min-height: 39px;
+  max-width: 100%;
+  padding: 8px 30px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.performance-filters select:focus-visible {
+  outline: 3px solid rgba(0, 104, 155, .2);
+  outline-offset: 2px;
+}
+
+.performance-filters select[hidden] {
+  display: none;
+}
+
+.performance-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  padding: 20px 23px 0;
+}
+
+.performance-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--paper);
+  transition: border-color .2s ease;
+}
+
+.performance-kpi:hover {
+  border-color: var(--course-button);
+}
+
+.performance-kpi > span {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.performance-kpi > strong {
+  max-width: 100%;
+  color: var(--ink);
+  font-size: clamp(23px, 2.5vw, 30px);
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: -.4px;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.performance-kpi > small {
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.performance-chart-section {
+  margin: 24px 23px 0;
+  padding: 22px 0 24px;
+  border-top: 1px solid var(--line);
+}
+
+.performance-chart-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.performance-chart-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.performance-chart-heading > span {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.performance-chart {
+  display: grid;
+  gap: 19px;
+}
+
+.performance-bar-row {
+  display: grid;
+  grid-template-columns: 95px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 13px;
+}
+
+.performance-bar-label {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.performance-bar-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+}
+
+.performance-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--course-button);
+  transition: width .3s ease;
+}
+
+.performance-bar-value {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.performance-empty {
+  padding: 30px 15px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .performance-kpis {
+    gap: 12px;
+  }
+
+  .performance-kpi {
+    padding: 16px;
+  }
+
+  .performance-kpi > strong {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 520px) {
+  .performance-panel .panel-heading {
+    padding: 17px;
+  }
+
+  .performance-filters {
+    gap: 8px;
+    padding: 17px 17px 0;
+  }
+
+  .performance-filters label {
+    width: 100%;
+  }
+
+  .performance-filters select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .performance-kpis {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 17px 17px 0;
+  }
+
+  .performance-kpi {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 5px 12px;
+    padding: 15px 17px;
+  }
+
+  .performance-kpi > span {
+    grid-column: 1;
+  }
+
+  .performance-kpi > strong {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 23px;
+    text-align: end;
+  }
+
+  .performance-kpi > small {
+    grid-column: 1;
+  }
+
+  .performance-chart-section {
+    margin: 20px 17px 0;
+    padding-top: 19px;
+  }
+
+  .performance-chart-heading {
+    margin-bottom: 20px;
+  }
+
+  .performance-bar-row {
+    grid-template-columns: 76px minmax(0, 1fr) 25px;
+    gap: 9px;
+  }
+
+  .performance-bar-label,
+  .performance-bar-value {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .performance-kpi,
+  .performance-bar-fill {
+    transition: none;
+  }
+}
+
+/* Performance Toggle */
+.performance-panel.performance-collapsed .performance-body {
+  display: none;
+}
+
+.performance-panel.performance-collapsed .panel-heading {
+  border-bottom: 0;
+}
+
+/* Performance Toggle */
+.performance-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 18px 18px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+
+.performance-toggle:hover {
+  background: var(--paper);
+  color: var(--course-button);
+}
+
+.performance-toggle:focus-visible {
+  outline: 2px solid var(--course-button);
+  outline-offset: -4px;
+}
+
+.performance-toggle-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 2;
+  transition: transform .2s ease;
+}
+
+.performance-panel.performance-collapsed .performance-body {
+  display: none;
+}
+
+.performance-panel.performance-collapsed .panel-heading {
+  border-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .performance-toggle,
+  .performance-toggle-icon {
+    transition: none;
+  }
+}

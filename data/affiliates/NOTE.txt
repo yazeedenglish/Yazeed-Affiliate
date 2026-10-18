@@ -30,6 +30,7 @@ Full template:
     "password": "AB123456",
     "name": "محمد",
     "active": true,
+    "couponCode": "TEST",
     "orders": [
   {
    "id": "ORDER-001",

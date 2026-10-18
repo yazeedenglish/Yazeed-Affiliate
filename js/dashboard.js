@@ -150,6 +150,369 @@ function renderOrders(orders) {
     $("transfersContent").innerHTML = `<div class="table-wrap"><table class="data-table"><thead><tr><th>تاريخ الحوالة</th><th>المبلغ المحوّل</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
+   function initPerformance(orders) {
+    const SHOW_PERFORMANCE_AVERAGE = true;
+  const panel = document.querySelector(".performance-panel");
+  const heading = panel?.querySelector(".panel-heading");
+  const periodSelect = $("performancePeriod");
+  const monthSelect = $("performanceMonth");
+  const yearSelect = $("performanceYear");
+
+  if (!panel || !periodSelect || !monthSelect || !yearSelect) {
+    return;
+  }
+
+  // إنشاء جسم قابل للطي للمؤشر.
+  let body = $("performanceBody");
+
+  if (!body && heading) {
+    body = document.createElement("div");
+    body.id = "performanceBody";
+    body.className = "performance-body";
+
+    Array.from(panel.children).forEach((child) => {
+      if (child !== heading) {
+        body.appendChild(child);
+      }
+    });
+
+    panel.appendChild(body);
+  }
+
+  // زر إظهار وإخفاء المؤشر.
+  if (heading) {
+    // زر إظهار وإخفاء المؤشر في أسفل القسم.
+let toggleButton = $("performanceToggle");
+
+if (!toggleButton) {
+  toggleButton = document.createElement("button");
+  toggleButton.type = "button";
+  toggleButton.id = "performanceToggle";
+  toggleButton.className = "performance-toggle";
+  toggleButton.setAttribute("aria-controls", "performanceBody");
+}
+
+// ضمان وجود الزر في أسفل القسم، وليس داخل العنوان.
+panel.appendChild(toggleButton);
+
+function updateToggle(collapsed) {
+  panel.classList.toggle("performance-collapsed", collapsed);
+
+  toggleButton.setAttribute(
+    "aria-expanded",
+    String(!collapsed)
+  );
+
+ toggleButton.innerHTML = collapsed
+  ? `<svg class="performance-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`
+  : `<svg class="performance-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>`;
+}
+
+toggleButton.addEventListener("click", () => {
+  updateToggle(
+    !panel.classList.contains("performance-collapsed")
+  );
+});
+
+// إخفاء المؤشر افتراضيًا عند دخول الصفحة.
+updateToggle(true);
+  }
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth =
+    `${currentYear}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const validOrders = orders.filter((order) => {
+    const date = new Date(order.addedAt);
+    return Number.isFinite(date.getTime());
+  });
+
+  // تحديد تاريخ أول طلب مؤهل.
+  const firstOrderDate = validOrders.length
+    ? new Date(
+        Math.min(...validOrders.map((order) => new Date(order.addedAt).getTime()))
+      )
+    : null;
+
+  const firstYear = firstOrderDate
+    ? firstOrderDate.getFullYear()
+    : currentYear;
+
+  const firstMonth = firstOrderDate
+    ? `${firstOrderDate.getFullYear()}-${String(
+        firstOrderDate.getMonth() + 1
+      ).padStart(2, "0")}`
+    : currentMonth;
+
+  const monthFormatter = new Intl.DateTimeFormat("en-SA", {
+    month: "long",
+    year: "numeric",
+    calendar: "gregory"
+  });
+
+  // عرض الأشهر من الشهر الحالي إلى شهر أول طلب فقط.
+  const monthOptions = [];
+
+  let cursor = new Date(currentYear, now.getMonth(), 1);
+  const firstMonthDate = new Date(
+    firstOrderDate
+      ? firstOrderDate.getFullYear()
+      : currentYear,
+    firstOrderDate
+      ? firstOrderDate.getMonth()
+      : now.getMonth(),
+    1
+  );
+
+  while (cursor >= firstMonthDate) {
+    const value =
+      `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`;
+
+    monthOptions.push({
+      value,
+      label: monthFormatter.format(cursor)
+    });
+
+    cursor = new Date(
+      cursor.getFullYear(),
+      cursor.getMonth() - 1,
+      1
+    );
+  }
+
+  monthSelect.innerHTML = monthOptions
+    .map((item) =>
+      `<option value="${item.value}">${item.label}</option>`
+    )
+    .join("");
+
+  monthSelect.value = currentMonth;
+
+  // عرض السنوات من السنة الحالية إلى سنة أول طلب.
+  const years = [];
+
+  for (let year = currentYear; year >= firstYear; year--) {
+    years.push(year);
+  }
+
+  yearSelect.innerHTML = years
+    .map((year) => `<option value="${year}">${year}</option>`)
+    .join("");
+
+  yearSelect.value = String(currentYear);
+
+  const averageCard = $("performanceAverage")?.closest(".performance-kpi");
+  const averageTitle = averageCard?.querySelector("span");
+  const averageDescription = averageCard?.querySelector("small");
+
+  function render() {
+    const period = periodSelect.value;
+    const selectedMonth = monthSelect.value;
+    const selectedYear = Number(yearSelect.value);
+
+    monthSelect.hidden = period !== "month";
+    yearSelect.hidden = period !== "year";
+
+    const filtered = validOrders.filter((order) => {
+      const date = new Date(order.addedAt);
+
+      if (period === "month") {
+        const key =
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+        return key === selectedMonth;
+      }
+
+      if (period === "year") {
+        return date.getFullYear() === selectedYear;
+      }
+
+      return true;
+    });
+
+    const totalCommission = filtered.reduce(
+      (sum, order) => sum + order.commission,
+      0
+    );
+
+    const ordersElement = $("performanceOrders");
+
+if (ordersElement) {
+  ordersElement.textContent =
+    new Intl.NumberFormat("en-SA").format(filtered.length);
+}
+
+    $("performanceCommission").textContent =
+      window.YEAffiliate.formatMoney(totalCommission);
+
+    // تغيير المتوسط وفق الفترة المختارة.
+    let average = 0;
+
+    if (period === "month") {
+      const [year, month] = selectedMonth.split("-").map(Number);
+
+const isCurrentMonth =
+  year === now.getFullYear() &&
+  month === now.getMonth() + 1;
+
+const daysToDivide = isCurrentMonth
+  ? now.getDate()
+  : new Date(year, month, 0).getDate();
+
+average = daysToDivide > 0
+  ? totalCommission / daysToDivide
+  : 0;
+
+      if (averageTitle) {
+        averageTitle.textContent = "المتوسط اليومي";
+      }
+
+      if (averageDescription) {
+        averageDescription.textContent = "متوسط أرباحك اليومية";
+      }
+    } else if (period === "year") {
+  const monthsToDivide =
+    selectedYear === currentYear
+      ? now.getMonth() + 1
+      : 12;
+
+  average = totalCommission / monthsToDivide;
+
+      if (averageTitle) {
+        averageTitle.textContent = "المتوسط الشهري";
+      }
+
+      if (averageDescription) {
+        averageDescription.textContent = "متوسط أرباحك الشهرية";
+      }
+    } else {
+      const yearCount = currentYear - firstYear + 1;
+
+      average = yearCount > 0 ? totalCommission / yearCount : 0;
+
+      if (averageTitle) {
+        averageTitle.textContent = "المتوسط السنوي";
+      }
+
+      if (averageDescription) {
+        averageDescription.textContent = "متوسط أرباحك السنوية";
+      }
+    }
+
+    $("performanceAverage").textContent =
+      window.YEAffiliate.formatMoney(average);
+
+    $("performanceChartTitle").textContent =
+      period === "month"
+        ? "الطلبات اليومية خلال الشهر"
+        : period === "year"
+          ? "نشاط الطلبات خلال السنة"
+          : "نشاط الطلبات عبر السنوات";
+
+    const buckets = new Map();
+
+    if (period === "month") {
+      const [year, month] = selectedMonth.split("-").map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+
+      // في شهر أول طلب، لا تعرض الأيام السابقة لأول طلب.
+      const startDay =
+        firstOrderDate &&
+        firstOrderDate.getFullYear() === year &&
+        firstOrderDate.getMonth() + 1 === month
+          ? firstOrderDate.getDate()
+          : 1;
+
+      for (let day = startDay; day <= daysInMonth; day++) {
+        buckets.set(String(day), 0);
+      }
+
+      filtered.forEach((order) => {
+        const day = new Date(order.addedAt).getDate();
+        const key = String(day);
+
+        if (buckets.has(key)) {
+          buckets.set(key, buckets.get(key) + 1);
+        }
+      });
+    } else if (period === "year") {
+      const monthFormatterShort = new Intl.DateTimeFormat("en-SA", {
+        month: "short",
+        calendar: "gregory"
+      });
+
+      const startMonth =
+        firstOrderDate && firstOrderDate.getFullYear() === selectedYear
+          ? firstOrderDate.getMonth()
+          : 0;
+
+      for (let month = startMonth; month < 12; month++) {
+        const label = monthFormatterShort.format(
+          new Date(selectedYear, month, 1)
+        );
+
+        buckets.set(label, 0);
+      }
+
+      filtered.forEach((order) => {
+        const date = new Date(order.addedAt);
+        const label = monthFormatterShort.format(
+          new Date(date.getFullYear(), date.getMonth(), 1)
+        );
+
+        if (buckets.has(label)) {
+          buckets.set(label, buckets.get(label) + 1);
+        }
+      });
+    } else {
+      // تضمين السنوات الواقعة بين أول طلب والسنة الحالية.
+      for (let year = firstYear; year <= currentYear; year++) {
+        buckets.set(String(year), 0);
+      }
+
+      filtered.forEach((order) => {
+        const year = String(new Date(order.addedAt).getFullYear());
+
+        if (buckets.has(year)) {
+          buckets.set(year, buckets.get(year) + 1);
+        }
+      });
+    }
+
+    const maxValue = Math.max(1, ...buckets.values());
+
+    $("performanceChart").innerHTML = filtered.length
+      ? [...buckets.entries()]
+          .map(([label, count]) => `
+            <div class="performance-bar-row">
+              <span class="performance-bar-label">${label}</span>
+              <div class="performance-bar-track">
+                <div
+                  class="performance-bar-fill"
+                  style="width:${(count / maxValue) * 100}%"
+                ></div>
+              </div>
+              <span class="performance-bar-value">${count}</span>
+            </div>
+          `)
+          .join("")
+      : '<div class="performance-empty">لا توجد طلبات مؤهلة خلال هذه الفترة</div>';
+
+    $("performanceChartCaption").textContent =
+      period === "month"
+        ? `${buckets.size} يومًا`
+        : period === "year"
+          ? `${buckets.size} شهرًا`
+          : `${buckets.size} سنة`;
+  }
+
+  periodSelect.addEventListener("change", render);
+  monthSelect.addEventListener("change", render);
+  yearSelect.addEventListener("change", render);
+
+  render();
+}
   
 async function init() {
   try {
@@ -303,6 +666,7 @@ const commission = Number(
     // Keep your existing pagination and table rendering
     renderOrders(eligibleOrders);
     renderTransfers(transfers);
+    initPerformance(eligibleOrders);
 
   } catch (error) {
     console.error("Dashboard loading error:", error);

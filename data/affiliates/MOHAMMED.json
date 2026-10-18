@@ -3,6 +3,7 @@
     "password": "YZ123456",
     "name": "يزيد",
     "active": true,
+    "couponCode": "MHMD",
     "orders": [
   {
    "id": "ORDER-001",

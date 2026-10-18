@@ -6,6 +6,15 @@
     "couponCode": "TEST",
     "orders": [
 
+                                   {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-10-17T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 0
+  },
+
                              {
    "id": "ORDER-001",
    "productId": "english",
@@ -92,6 +101,33 @@
    "id": "ORDER-123",
    "productId": "trab6",
     "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+      {
+   "id": "ORDER-123",
+   "productId": "step",
+    "addedAt": "2025-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+          {
+   "id": "ORDER-123",
+   "productId": "step",
+    "addedAt": "2024-07-14T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+        {
+   "id": "ORDER-123",
+   "productId": "step",
+    "addedAt": "2024-07-14T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
     "warrantyDays": 14
