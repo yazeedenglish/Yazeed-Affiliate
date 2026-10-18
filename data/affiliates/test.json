@@ -1,7 +1,7 @@
 {
-    "code": "TEST",
-    "password": "TEST1234",
-    "name": "TEST",
+    "code": "test",
+    "password": "12345678",
+    "name": "test",
     "active": true,
     "couponCode": "TEST",
     "orders": [

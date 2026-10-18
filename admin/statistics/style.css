@@ -1105,3 +1105,7 @@ button:disabled {
     transition-duration: .01ms !important;
   }
 }
+
+.logout-button:hover {
+  color: #C94C4C;
+}

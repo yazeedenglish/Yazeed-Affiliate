@@ -114,14 +114,8 @@ $("#storeProfit").textContent = money(storeProfit);
     }).join("") : '<tr><td colspan="7" class="empty-cell">لا توجد طلبات ضمن الفترة المحددة.</td></tr>';
   }
 
-  // Update this list whenever you add a new affiliate JSON file.
-  // Paths are relative to /admin/ and point to the existing project data folder.
-  const AFFILIATE_FILES = [
-    "MOHAMMED.json",
-    "PARTNER001.json",
-    "TEST.json"
-  ];
-  const DATA_BASE = "../data/affiliates/";
+  
+  const DATA_BASE = "../../data/affiliates/";
 
   async function fetchJson(url) {
     const response = await fetch(url, { cache: "no-store" });
@@ -134,10 +128,26 @@ $("#storeProfit").textContent = money(storeProfit);
     button.textContent = "جارٍ تحميل البيانات…";
     status("جارٍ تحميل ملفات الشركاء والمنتجات من المشروع…");
     try {
-      const [products, loaded] = await Promise.all([
-        fetchJson(`${DATA_BASE}products.json`),
-        Promise.all(AFFILIATE_FILES.map((file) => fetchJson(`${DATA_BASE}${encodeURIComponent(file)}`)))
-      ]);
+      const [products, affiliateList] = await Promise.all([
+  fetchJson(`${DATA_BASE}products.json`),
+  fetchJson(".././affiliates.json")
+]);
+
+if (
+  !affiliateList ||
+  !Array.isArray(affiliateList.files) ||
+  !affiliateList.files.every(
+    (file) => typeof file === "string" && file.endsWith(".json")
+  )
+) {
+  throw new Error("صيغة affiliates.json غير صحيحة.");
+}
+
+const loaded = await Promise.all(
+  affiliateList.files.map((file) =>
+    fetchJson(`${DATA_BASE}${encodeURIComponent(file)}`)
+  )
+);
       if (!products || typeof products !== "object" || Array.isArray(products)) throw new Error("صيغة products.json غير صحيحة.");
       const invalid = loaded.filter((p) => !p || typeof p !== "object" || !Array.isArray(p.orders));
       if (invalid.length) throw new Error("تأكد أن كل ملف شريك يحتوي على مصفوفة orders.");
@@ -164,6 +174,12 @@ $("#storeProfit").textContent = money(storeProfit);
       button.disabled = false;
       button.textContent = "تحديث البيانات";
     }
+
+    document.getElementById("logoutButton")?.addEventListener("click", () => {
+  localStorage.removeItem("ye_admin_login_expiry");
+  window.location.replace("../");
+});
+
   }
   function status(message, isError = false) {
     $("#importStatus").textContent = message;
