@@ -137,22 +137,41 @@
   >
 </div>
 
+<div class="field field-full">
+  <label for="password">
+    كلمة المرور <span>*</span>
+  </label>
+
+  <input
+    type="password"
+    id="password"
+    name="كلمة المرور"
+    placeholder="أكتب كلمة مرور من 8 خانات"
+    minlength="8"
+    maxlength="8"
+    pattern="[A-Za-z0-9]{8}"
+    title="يجب أن تتكون كلمة المرور من 8 أحرف أو أرقام إنجليزية فقط"
+    autocomplete="new-password"
+    aria-describedby="passwordHint"
+    required
+  >
+
+</div>
+
             <div class="field field-full">
               <label for="marketingCode">
   ما هو كودك التسويقي الذي تفضّله؟ <span>*</span>
 </label>
               <input type="text" id="marketingCode"
                 name="الكود التسويقي المفضل"
-                placeholder="مثال: YZD5"
+                placeholder=" اكتب كود قصير وسهل التذكّر"
                  minlength="3"
                 maxlength="6"
                  pattern="[A-Za-z0-9]{3,6}"
                 autocomplete="off"
                 required
                 aria-describedby="codeHint">
-              <small id="codeHint" class="field-hint">
-                اختر كودًا قصيرًا وسهل التذكر
-              </small>
+                
             </div>
           </div>
         </div>
@@ -372,8 +391,8 @@
                     </svg>
                   </span>
                   <span>
-                    <strong>المجتمعات والقنوات</strong>
-                    <small>قنوات Telegram والمجموعات</small>
+                    <strong>القنوات والمجتمعات</strong>
+                    <small>قنوات ومجتمعات تيلقرام</small>
                   </span>
                   <span class="choice-check"></span>
                 </span>
@@ -424,7 +443,7 @@
             </label>
             <textarea id="about" name="نبذة عن المتقدم"
               rows="5" maxlength="2000"
-              placeholder="أخبرنا عن خبرتك في التسويق، وطبيعة جمهورك، وأفكارك لتسويق منتجاتنا..."></textarea>
+              placeholder="أخبرنا عن خبرتك في التسويق، وطبيعة متابعينك، وأفكارك لتسويق منتجاتنا..."></textarea>
             <small class="field-hint">
 
             </small>
@@ -447,7 +466,7 @@
               <a href="/policy" target="_blank" rel="noopener noreferrer">
                 سياسة برنامج الشركاء
               </a>
-              وأتعهد بالالتزام بأحكامها.
+              وأتعهد بالالتزام بأحكامها
             </span>
           </label>
         </div>
