@@ -1,8 +1,9 @@
 {
-    "code": "PARTNER001",
+    "code": "XX_Mohammed_XX",
     "password": "AB123456",
     "name": "محمد",
     "active": true,
+    "couponCode": "MOHAMMED10",
     "orders": [
   {
    "id": "ORDER-001",

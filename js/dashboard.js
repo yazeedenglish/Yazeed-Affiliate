@@ -6,6 +6,30 @@
   }
 
   const $ = (id) => document.getElementById(id);
+  const copyCouponButton = $("copyCouponButton");
+
+if (copyCouponButton) {
+copyCouponButton.addEventListener("click", async () => {
+const couponCode = $("couponCode").textContent.trim();
+const message = $("couponMessage");
+
+  if (!couponCode || copyCouponButton.disabled) return;
+
+  try {
+    await navigator.clipboard.writeText(couponCode);
+
+    copyCouponButton.disabled = true;
+    copyCouponButton.setAttribute("aria-label", "تم نسخ كود الخصم");
+    copyCouponButton.setAttribute("title", "تم نسخ كود الخصم");
+
+    message.textContent = "";
+  } catch (error) {
+    message.textContent =
+      "تعذر النسخ تلقائيًا. حاول مرة أخرى.";
+  }
+});
+
+}
   document.querySelectorAll("[data-current-year]").forEach((el) => { el.textContent = new Date().getFullYear(); });
 
   function emptyState(icon, title, description) {
@@ -161,6 +185,15 @@ async function init() {
     }
 
     $("partnerName").textContent = partner.name || "الشريك";
+     const couponCode = String(partner.couponCode || "").trim();
+
+    $("couponCode").textContent = couponCode || "غير مخصص";
+    $("copyCouponButton").disabled = !couponCode;
+
+    if (!couponCode) {
+      $("couponMessage").textContent =
+        "";
+    }
 
     const now = Date.now();
 

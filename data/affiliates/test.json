@@ -3,6 +3,7 @@
     "password": "TEST1234",
     "name": "TEST",
     "active": true,
+    "couponCode": "TEST",
     "orders": [
 
                              {

@@ -43,6 +43,32 @@
       <p>بارك الله في رزقك وسعيك</p>
     </section>
 
+    <section class="promo-code-card" aria-labelledby="couponHeading">
+  <div class="promo-code-info">
+    <h2 class="promo-code-label" id="couponHeading">كودك التسويقي</h2>
+    <p class="promo-code-description">شارك هذا الكود مع متابعينك لتحصيل العمولات</p>
+    <p class="coupon-message" id="couponMessage" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="promo-code-actions">
+  <strong id="couponCode">...</strong>
+  <button
+    class="coupon-copy-button"
+    type="button"
+    id="copyCouponButton"
+    disabled
+    aria-label="نسخ كود الخصم"
+    title="نسخ كود الخصم"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="8" y="8" width="13" height="13" rx="2"/>
+      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
+    </svg>
+    <span id="copyCouponText"></span>
+  </button>
+</div>
+</section>
+
     <section class="stats-grid" aria-label="إحصائيات الشريك">
       <article class="stat-card">
         <div class="stat-top"><span class="stat-label">إجمالي الطلبات</span><span class="stat-icon">
