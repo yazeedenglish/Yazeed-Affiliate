@@ -137,27 +137,6 @@
   >
 </div>
 
-<div class="field field-full">
-  <label for="password">
-    كلمة المرور <span>*</span>
-  </label>
-
-  <input
-    type="password"
-    id="password"
-    name="كلمة المرور"
-    placeholder="أكتب كلمة مرور من 8 خانات"
-    minlength="8"
-    maxlength="8"
-    pattern="[A-Za-z0-9]{8}"
-    title="يجب أن تتكون كلمة المرور من 8 أحرف أو أرقام إنجليزية فقط"
-    autocomplete="new-password"
-    aria-describedby="passwordHint"
-    required
-  >
-
-</div>
-
             <div class="field field-full">
               <label for="marketingCode">
   ما هو كودك التسويقي الذي تفضّله؟ <span>*</span>
@@ -480,11 +459,6 @@
           <span>إرسال طلب الانضمام</span>
         </button>
 
-        <p class="form-disclaimer">
-          بإرسال الطلب، فإنك توافق على استخدام البيانات المقدمة
-          لمراجعة طلب انضمامك إلى برنامج الشركاء
-        </p>
-
       </form>
     </section>
 
@@ -502,6 +476,24 @@
 
     <p>© <span data-current-year></span> Yazeed English</p>
   </footer>
+
+  <script>
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+
+  function validatePasswordMatch() {
+    if (confirmPasswordInput.value !== passwordInput.value) {
+      confirmPasswordInput.setCustomValidity(
+        "رمز الدخول غير متطابق"
+      );
+    } else {
+      confirmPasswordInput.setCustomValidity("");
+    }
+  }
+
+  passwordInput.addEventListener("input", validatePasswordMatch);
+  confirmPasswordInput.addEventListener("input", validatePasswordMatch);
+</script>
 
 </body>
 </html>
