@@ -1,0 +1,36 @@
+{
+    "code": "username-match-json-file",
+    "password": "8-digits-password",
+    "name": "name",
+    "active": true,
+    "couponCode": "couponCode",
+    "orders": [
+  {
+   "id": "001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  },
+
+    {
+   "id": "002",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "commissionRate": 30,
+    "warrantyDays": 14
+  }
+
+  
+  ],
+  "transfers": [
+
+    {
+    "date": "0000-00-00",
+    "amount": 0.00
+  }
+
+  ]
+}

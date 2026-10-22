@@ -9,136 +9,40 @@
                                    {
    "id": "ORDER-001",
    "productId": "english",
-    "addedAt": "2026-10-17T03:34:59+03:00",
+    "addedAt": "2026-01-01T03:34:59+03:00",
      "status": "approved",
+     "salePrice": 0,
     "commissionRate": 30,
     "warrantyDays": 0
   },
 
                              {
    "id": "ORDER-001",
-   "productId": "english",
-    "addedAt": "2026-10-04T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 8
-  },
-
-                     {
-   "id": "ORDER-002",
-   "productId": "english",
-    "addedAt": "2026-10-03T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 8
-  },
-
-             {
-   "id": "ORDER-003",
    "productId": "step",
-    "addedAt": "2026-10-02T03:34:59+03:00",
+    "addedAt": "2026-01-01T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
-    "warrantyDays": 8
+    "salePrice": 0,
+    "warrantyDays": 0
   },
 
-        {
-   "id": "ORDER-004",
-   "productId": "english",
-    "addedAt": "2026-10-02T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-
-  {
-   "id": "ORDER-005",
-   "productId": "trab6",
-    "addedAt": "2026-09-27T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-    {
-   "id": "ORDER-006",
-   "productId": "step",
-    "addedAt": "2026-09-13T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-    {
+                               {
    "id": "ORDER-001",
    "productId": "trab6",
-    "addedAt": "2026-09-12T03:34:59+03:00",
+    "addedAt": "2026-01-01T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-    {
-   "id": "ORDER-001",
-   "productId": "english",
-    "addedAt": "2026-09-02T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-    {
-   "id": "ORDER-001",
-   "productId": "step",
-    "addedAt": "2026-08-27T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-    {
-   "id": "ORDER-123",
-   "productId": "trab6",
-    "addedAt": "2026-08-16T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-      {
-   "id": "ORDER-123",
-   "productId": "step",
-    "addedAt": "2025-08-16T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-          {
-   "id": "ORDER-123",
-   "productId": "step",
-    "addedAt": "2024-07-14T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
-  },
-
-        {
-   "id": "ORDER-123",
-   "productId": "step",
-    "addedAt": "2024-07-14T03:34:59+03:00",
-     "status": "approved",
-    "commissionRate": 30,
-    "warrantyDays": 14
+    "salePrice": 0,
+    "warrantyDays": 0
   }
+
   
   ],
   "transfers": [
 
     {
-    "date": "2026-09-17",
-    "amount": 50.10
+    "date": "2026-01-01",
+    "amount": 0.00
   }
 
   ]
