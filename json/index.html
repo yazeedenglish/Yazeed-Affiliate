@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order JSON Studio — Fast Order Code Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Cairo (for Arabic product names) & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Cairo', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            arabic: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbars & Subtle Animations */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.8);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.8);
+    }
+
+    .json-key { color: #93c5fd; }
+    .json-string { color: #86efac; }
+    .json-number { color: #fca5a5; }
+    .json-boolean { color: #fcd34d; }
+
+    @keyframes pulseSubtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+    }
+    .animate-pop {
+      animation: pulseSubtle 0.25s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Product Catalog Modal -->
+  <div id="catalogModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Products Catalog</h3>
+            <p class="text-xs text-slate-400">Manage product keys, Arabic names, and default prices</p>
+          </div>
+        </div>
+        <button onclick="toggleCatalogModal(false)" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Existing Products List -->
+      <div id="catalogList" class="my-4 max-h-60 overflow-y-auto space-y-2 pr-1"></div>
+
+      <!-- Add New Product Form -->
+      <form id="addProductForm" onsubmit="handleAddProduct(event)" class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Add / Update Product</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Key (productId)</label>
+            <input type="text" id="newProdKey" required placeholder="e.g. grammar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Name (Arabic/Title)</label>
+            <input type="text" id="newProdName" required placeholder="دورة القواعد" dir="rtl" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-arabic" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Price</label>
+            <input type="number" id="newProdPrice" required placeholder="49" min="0" step="any" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono" />
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-1">
+          <button type="button" onclick="resetDefaultCatalog()" class="text-xs text-slate-400 hover:text-amber-400 transition">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Default 4 Products
+          </button>
+          <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Save Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <i class="fa-solid fa-code text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Order JSON Builder</h1>
+            <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded-full bg-brand-500/15 text-brand-400 border border-brand-500/30 font-semibold">Fast Mode</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Instant JSON generator for orders with custom pricing &amp; bulk support</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleCatalogModal(true)" class="bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs font-medium flex items-center gap-2 transition shadow-sm">
+          <i class="fa-solid fa-tags text-brand-400"></i>
+          <span>Products (<span id="productCountBadge">4</span>)</span>
+        </button>
+        <button onclick="loadSampleOrder()" class="bg-slate-800/90 hover:bg-slate-800 text-slate-300 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-medium hidden md:flex items-center gap-1.5 transition" title="Fill example order #295332280">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+          <span>Sample</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Left Column: Order Builder & Queue (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Mode Switcher Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-800 bg-slate-950/50 p-1.5 gap-1.5">
+          <button id="tabSingleBtn" onclick="switchEntryMode('single')" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Single Order Entry</span>
+          </button>
+          <button id="tabBulkBtn" onclick="switchEntryMode('bulk')" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Bulk IDs Paste</span>
+          </button>
+        </div>
+
+        <div class="p-5 sm:p-6 space-y-5">
+          <!-- SINGLE ENTRY MODE -->
+          <div id="singleEntryPanel">
+            <div class="flex items-center justify-between mb-2">
+              <label for="orderIdInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                Order Number (<code class="text-brand-400 font-mono">id</code>) <span class="text-rose-400">*</span>
+              </label>
+              <div class="flex items-center gap-2">
+                <span id="singleDigitBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">0 / 9 digits</span>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">Press <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px] font-mono">Enter</kbd></span>
+              </div>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fa-solid fa-hashtag"></i>
+              </div>
+              <input
+                type="text"
+                id="orderIdInput"
+                inputmode="numeric"
+                maxlength="9"
+                placeholder="9 digits e.g. 295332280"
+                autocomplete="off"
+                oninput="onSingleOrderIdInput(this)"
+                onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addOrderFromForm(); }"
+                class="w-full bg-slate-950 border border-slate-700/90 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-xl pl-10 pr-24 py-3 text-base font-mono text-white placeholder-slate-600 transition outline-none tracking-wider"
+              />
+              <button
+                type="button"
+                onclick="pasteClipboardToId()"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1"
+                title="Paste from clipboard"
+              >
+                <i class="fa-regular fa-paste"></i> Paste
+              </button>
+            </div>
+            <p id="singleOrderValidationMsg" class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-brand-400"></i>
+              <span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>
+            </p>
+          </div>
+
+          <!-- BULK ENTRY MODE (Hidden by default) -->
+          <div id="bulkEntryPanel" class="hidden space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="bulkIdsInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                Multiple 9-Digit Order IDs <span class="text-rose-400">*</span>
+              </label>
+              <span id="bulkStatsBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">0 valid • 0 invalid</span>
+            </div>
+            <textarea
+              id="bulkIdsInput"
+              rows="4"
+              placeholder="295332280&#10;295332281&#10;295332282"
+              oninput="onBulkInputUpdate()"
+              class="w-full bg-slate-950 border border-slate-700/90 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-xl p-3.5 text-sm font-mono text-white placeholder-slate-600 transition outline-none"
+            ></textarea>
+            <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-filter text-brand-400"></i>
+              <span>Only valid 9-digit numbers are accepted. Any duplicate Order ID + Product combinations are skipped.</span>
+            </p>
+          </div>
+
+          <!-- PRODUCT SELECTION (Quick Cards + Dropdown) -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="productSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                Select Product (<code class="text-brand-400 font-mono">productId</code>)
+              </label>
+              <span id="selectedProductPriceHint" class="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                Default Price: 49 SAR
+              </span>
+            </div>
+
+            <!-- Quick Product Pills -->
+            <div id="productQuickCards" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+
+            <!-- Standard Dropdown for accessibility & large catalogs -->
+            <select
+              id="productSelect"
+              onchange="onProductSelectChange(this.value)"
+              class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 outline-none transition"
+            ></select>
+          </div>
+
+          <!-- STATUS & EDIT PRICE ROW -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <!-- Status Toggle -->
+            <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-col justify-between">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2.5">
+                Order Status (<code class="text-brand-400 font-mono">status</code>)
+              </label>
+              <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  id="statusApprovedBtn"
+                  onclick="setOrderStatus('approved')"
+                  class="py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-emerald-600 text-white shadow"
+                >
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>approved</span>
+                </button>
+                <button
+                  type="button"
+                  id="statusRejectedBtn"
+                  onclick="setOrderStatus('rejected')"
+                  class="py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white"
+                >
+                  <i class="fa-solid fa-circle-xmark"></i>
+                  <span>rejected</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Edit Price Option (Adds "salePrice": 0 underneath status) -->
+            <div id="editPriceCard" class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 transition-all">
+              <div class="flex items-center justify-between mb-2.5">
+                <label for="editPriceToggle" class="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    id="editPriceToggle"
+                    onchange="onEditPriceToggle()"
+                    class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer"
+                  />
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-200">Edit Price</span>
+                </label>
+                <span class="text-[11px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                  +"salePrice"
+                </span>
+              </div>
+
+              <!-- Sale Price Input Box (Enabled when Edit Price is checked) -->
+              <div id="salePriceWrapper" class="opacity-40 pointer-events-none transition-opacity flex items-center gap-2">
+                <div class="relative flex-1">
+                  <input
+                    type="number"
+                    id="salePriceInput"
+                    value="0"
+                    step="any"
+                    oninput="handleLivePreview()"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-lg pl-3 pr-14 py-1.5 text-sm font-mono text-white outline-none"
+                  />
+                  <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400">salePrice</span>
+                </div>
+                <button
+                  type="button"
+                  onclick="setSalePriceValue(0)"
+                  class="px-2 py-1.5 text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition"
+                  title="Set salePrice to 0"
+                >
+                  0
+                </button>
+                <button
+                  type="button"
+                  onclick="setSalePriceToProductDefault()"
+                  class="px-2 py-1.5 text-xs font-mono bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg border border-slate-700 transition"
+                  title="Use selected product's default price"
+                >
+                  Prod
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMMISSION, WARRANTY & TIMESTAMP ROW -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
+            <!-- Commission Rate -->
+            <div class="sm:col-span-3">
+              <label for="commissionInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                Commission Rate
+              </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="commissionInput"
+                  value="30"
+                  step="any"
+                  oninput="handleLivePreview()"
+                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">%</span>
+              </div>
+            </div>
+
+            <!-- Warranty Days -->
+            <div class="sm:col-span-3">
+              <label for="warrantyInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                Warranty Days
+              </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="warrantyInput"
+                  value="14"
+                  step="1"
+                  oninput="handleLivePreview()"
+                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none"
+                />
+                <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-500">days</span>
+              </div>
+            </div>
+
+            <!-- AddedAt Timestamp -->
+            <div class="sm:col-span-6">
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="addedAtInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Added At (<code class="text-brand-400 font-mono">+03:00</code>)
+                </label>
+                <label class="flex items-center gap-1.5 text-[11px] text-slate-400 cursor-pointer select-none">
+                  <input type="checkbox" id="autoNowToggle" onchange="onAutoNowChange()" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-brand-600" />
+                  <span>Auto current time on generate</span>
+                </label>
+              </div>
+              <div class="flex gap-1.5">
+                <input
+                  type="text"
+                  id="addedAtInput"
+                  oninput="handleLivePreview()"
+                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 outline-none"
+                />
+                <button
+                  type="button"
+                  onclick="toggleDatePickerPanel()"
+                  id="datePickerToggleBtn"
+                  class="bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 px-3 rounded-xl border border-brand-500/40 text-xs font-semibold transition flex items-center gap-1.5 shrink-0"
+                  title="Choose Year, Month, or Day easily"
+                >
+                  <i class="fa-regular fa-calendar-days text-brand-400"></i>
+                  <span>Pick Date</span>
+                </button>
+                <button
+                  type="button"
+                  onclick="refreshTimestampNow(true)"
+                  class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 rounded-xl border border-slate-700 text-xs font-medium transition flex items-center gap-1 shrink-0"
+                  title="Update to current time (+03:00)"
+                >
+                  <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+                  <span>Now</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- EASY YEAR / MONTH / DAY PICKER PANEL -->
+          <div id="easyDatePickerPanel" class="hidden bg-slate-950/90 border border-brand-500/40 rounded-2xl p-4 space-y-3.5 shadow-inner">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-brand-400"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-white">Easy Year / Month / Day Selector</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button type="button" onclick="applyQuickDatePreset(0)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 px-2.5 py-1 rounded-lg transition font-medium">Today</button>
+                <button type="button" onclick="applyQuickDatePreset(-1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-lg transition font-medium">Yesterday</button>
+                <button type="button" onclick="shiftCurrentDateDays(-1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2 py-1 rounded-lg transition font-mono" title="Subtract 1 Day">-1d</button>
+                <button type="button" onclick="shiftCurrentDateDays(1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2 py-1 rounded-lg transition font-mono" title="Add 1 Day">+1d</button>
+                <button type="button" onclick="toggleDatePickerPanel(false)" class="text-slate-400 hover:text-white px-1.5 py-1 text-xs">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <!-- Year Selector -->
+              <div>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Year</label>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="stepPickerField('year', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
+                  <select id="pickerYearSelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500"></select>
+                  <button type="button" onclick="stepPickerField('year', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                </div>
+              </div>
+
+              <!-- Month Selector -->
+              <div>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Month</label>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="stepPickerField('month', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
+                  <select id="pickerMonthSelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500">
+                    <option value="01">01 - Jan</option>
+                    <option value="02">02 - Feb</option>
+                    <option value="03">03 - Mar</option>
+                    <option value="04">04 - Apr</option>
+                    <option value="05">05 - May</option>
+                    <option value="06">06 - Jun</option>
+                    <option value="07">07 - Jul</option>
+                    <option value="08">08 - Aug</option>
+                    <option value="09">09 - Sep</option>
+                    <option value="10">10 - Oct</option>
+                    <option value="11">11 - Nov</option>
+                    <option value="12">12 - Dec</option>
+                  </select>
+                  <button type="button" onclick="stepPickerField('month', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                </div>
+              </div>
+
+              <!-- Day Selector -->
+              <div>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Day</label>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="stepPickerField('day', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
+                  <select id="pickerDaySelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500"></select>
+                  <button type="button" onclick="stepPickerField('day', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                </div>
+              </div>
+
+              <!-- Time (HH:mm:ss) -->
+              <div>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Time (HH:MM:SS)</label>
+                <div class="flex items-center gap-1">
+                  <input
+                    type="time"
+                    id="pickerTimeInput"
+                    step="1"
+                    value="03:34:59"
+                    onchange="applyEasyDatePickerChange()"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-mono text-white outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Day Number Grid (1..31) for 1-click day change -->
+            <div>
+              <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Click Day of Month</div>
+              <div id="quickDayGrid" class="grid grid-cols-11 sm:grid-cols-16 gap-1"></div>
+            </div>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onclick="addOrderFromForm()"
+              class="flex-1 min-w-[200px] bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold py-3 px-5 rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 text-sm"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span id="primaryActionBtnText">Generate &amp; Add to List</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="generateInstantOnly()"
+              class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl border border-slate-700 transition flex items-center gap-2 text-xs sm:text-sm"
+              title="Generate directly from current form fields and copy immediately"
+            >
+              <i class="fa-regular fa-copy text-brand-400"></i>
+              <span>Quick Copy Current</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="resetFormDefaults()"
+              class="bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 py-3 px-3.5 rounded-xl border border-slate-800 transition text-xs"
+              title="Reset form to defaults"
+            >
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUEUED / SELECTED ORDERS LIST -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Added Orders Queue</h2>
+            <span id="queueCountBadge" class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">0</span>
+            <span class="text-[11px] font-mono text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2 py-0.5 rounded hidden sm:inline-flex items-center gap-1">
+              <i class="fa-solid fa-arrow-down-wide-short"></i> Newest Date First
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              onclick="toggleAllQueueSalePrice()"
+              id="bulkTogglePriceBtn"
+              class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 px-2.5 py-1 rounded-lg transition"
+            >
+              <i class="fa-solid fa-dollar-sign mr-1"></i>Toggle All Edit Price
+            </button>
+            <button
+              type="button"
+              onclick="clearOrderQueue()"
+              id="clearQueueBtn"
+              class="hidden text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 px-2.5 py-1 rounded-lg transition"
+            >
+              <i class="fa-regular fa-trash-can mr-1"></i>Clear All
+            </button>
+          </div>
+        </div>
+
+        <div id="orderQueueContainer" class="p-4 max-h-80 overflow-y-auto space-y-2.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: JSON Code Output & Download (5 cols) -->
+    <div class="lg:col-span-5 lg:sticky lg:top-22 space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <!-- Output Top Bar -->
+        <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-file-code text-brand-400"></i>
+              <span>Generated JSON Code</span>
+            </h2>
+            <p id="outputModeSubtext" class="text-[11px] text-slate-400 mt-0.5">Live preview of your order structure</p>
+          </div>
+
+          <!-- Format Selector -->
+          <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px] font-medium">
+            <button
+              type="button"
+              id="fmtSnippetBtn"
+              onclick="setOutputFormat('snippet')"
+              class="px-2.5 py-1 rounded-lg transition bg-brand-600 text-white"
+              title="Object with trailing comma { ... }, just like your example"
+            >
+              { }, Snippet
+            </button>
+            <button
+              type="button"
+              id="fmtArrayBtn"
+              onclick="setOutputFormat('array')"
+              class="px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white"
+              title="Valid JSON Array [ { ... } ]"
+            >
+              [ ] Array
+            </button>
+            <button
+              type="button"
+              id="fmtObjectBtn"
+              onclick="setOutputFormat('object')"
+              class="px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white"
+              title="Clean JSON Object without trailing comma"
+            >
+              { } Clean
+            </button>
+          </div>
+        </div>
+
+        <!-- Primary Copy & Download Bar -->
+        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800/80 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onclick="copyGeneratedJson()"
+            id="copyJsonBtn"
+            class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+          >
+            <i class="fa-regular fa-copy"></i>
+            <span>Copy JSON Code</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="downloadGeneratedJson()"
+            class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold py-2.5 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+          >
+            <i class="fa-solid fa-download text-brand-400"></i>
+            <span>Download .json</span>
+          </button>
+        </div>
+
+        <!-- Syntax Highlighted Code Preview + Editable Raw Textarea Toggle -->
+        <div class="relative bg-slate-950">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-slate-900 text-[11px] font-mono text-slate-400">
+            <span id="jsonLineStats">1 order • Ready</span>
+            <button
+              type="button"
+              onclick="toggleRawTextView()"
+              id="rawViewToggleBtn"
+              class="text-slate-400 hover:text-brand-400 transition flex items-center gap-1"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>Raw Text Mode</span>
+            </button>
+          </div>
+
+          <!-- Highlighted Pre Block -->
+          <pre
+            id="jsonHighlightedPre"
+            class="p-4 sm:p-5 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto max-h-[460px] text-slate-200 select-all"
+          ></pre>
+
+          <!-- Editable Raw Textarea (hidden unless toggled) -->
+          <textarea
+            id="jsonRawTextarea"
+            rows="16"
+            class="hidden w-full p-4 sm:p-5 bg-slate-950 text-emerald-300 font-mono text-xs sm:text-sm leading-relaxed focus:outline-none resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Reference Footer showing current active Product Catalog JSON -->
+        <div class="p-3.5 bg-slate-950/90 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-brand-400"></i>
+            <span>When <strong>Edit Price</strong> is active, <code class="text-amber-300 font-mono">"salePrice"</code> is placed right below <code class="text-emerald-300 font-mono">"status"</code>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+    <script>
+    /**************************************************************
+     * 1. DEFAULT PRODUCTS CATALOG & STATE
+     **************************************************************/
+    const DEFAULT_PRODUCTS = {
+      step: {
+        name: "دورة ستيب",
+        price: 99
+      },
+      english: {
+        name: "برنامج الانجليزي",
+        price: 49
+      },
+      trab6: {
+        name: "ترابط الكلمات",
+        price: 19
+      },
+      writing: {
+        name: "دورة الكتابة",
+        price: 49
+      }
+    };
+
+    let productsCatalog = {};
+    let orderQueue = [];
+    let currentEntryMode = 'single'; // 'single' | 'bulk'
+    let currentStatus = 'approved';  // 'approved' | 'rejected'
+    let outputFormat = 'snippet';    // 'snippet' | 'array' | 'object'
+    let isRawView = false;
+
+    /**************************************************************
+     * 2. INITIALIZATION & STORAGE
+     **************************************************************/
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCatalogFromStorage();
+      initEasyDatePickerOptions();
+      refreshTimestampNow(false);
+      renderProductSelectors('english');
+      renderOrderQueue();
+      handleLivePreview();
+    });
+
+    function loadCatalogFromStorage() {
+      try {
+        const saved = localStorage.getItem('orderJsonStudio_products');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Object.keys(parsed).length > 0) {
+            productsCatalog = parsed;
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not read catalog from localStorage:', err);
+      }
+      productsCatalog = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+    }
+
+    function saveCatalogToStorage() {
+      try {
+        localStorage.setItem('orderJsonStudio_products', JSON.stringify(productsCatalog));
+      } catch (err) {
+        console.warn('Could not save catalog:', err);
+      }
+    }
+
+    /**************************************************************
+     * 3. TIMESTAMP FORMATTING (+03:00 OFFSET)
+     **************************************************************/
+    function getFormattedTimestampPlus3(dateObj = new Date()) {
+      // Shift time to UTC+3 explicitly so it always formats as YYYY-MM-DDTHH:mm:ss+03:00
+      const utcMs = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+      const plus3Date = new Date(utcMs + (3 * 3600000));
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const year = plus3Date.getFullYear();
+      const month = pad(plus3Date.getMonth() + 1);
+      const day = pad(plus3Date.getDate());
+      const hours = pad(plus3Date.getHours());
+      const minutes = pad(plus3Date.getMinutes());
+      const seconds = pad(plus3Date.getSeconds());
+
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+03:00`;
+    }
+
+    function refreshTimestampNow(triggerPreview = true) {
+      const input = document.getElementById('addedAtInput');
+      input.value = getFormattedTimestampPlus3(new Date());
+      syncEasyDatePickerFromTimestamp(input.value);
+      if (triggerPreview) {
+        handleLivePreview();
+        showToast('Timestamp updated to current time (+03:00)', 'info');
+      }
+    }
+
+    function onAutoNowChange() {
+      const checked = document.getElementById('autoNowToggle').checked;
+      if (checked) {
+        refreshTimestampNow(false);
+        handleLivePreview();
+      }
+    }
+
+    /**************************************************************
+     * 3B. EASY YEAR / MONTH / DAY PICKER LOGIC
+     **************************************************************/
+    function initEasyDatePickerOptions() {
+      const yearSelect = document.getElementById('pickerYearSelect');
+      if (!yearSelect) return;
+      yearSelect.innerHTML = '';
+      for (let y = 2022; y <= 2032; y++) {
+        const opt = document.createElement('option');
+        opt.value = String(y);
+        opt.textContent = String(y);
+        yearSelect.appendChild(opt);
+      }
+      populateDayOptions(2026, 10, 24);
+    }
+
+    function getDaysInMonth(year, month) {
+      return new Date(Number(year), Number(month), 0).getDate();
+    }
+
+    function populateDayOptions(year, month, selectedDay) {
+      const daySelect = document.getElementById('pickerDaySelect');
+      const quickDayGrid = document.getElementById('quickDayGrid');
+      if (!daySelect || !quickDayGrid) return;
+
+      const maxDays = getDaysInMonth(year, month);
+      const safeDay = Math.min(Number(selectedDay) || 1, maxDays);
+
+      daySelect.innerHTML = '';
+      quickDayGrid.innerHTML = '';
+
+      for (let d = 1; d <= maxDays; d++) {
+        const dStr = String(d).padStart(2, '0');
+        const opt = document.createElement('option');
+        opt.value = dStr;
+        opt.textContent = dStr;
+        if (d === safeDay) opt.selected = true;
+        daySelect.appendChild(opt);
+
+        const dayBtn = document.createElement('button');
+        dayBtn.type = 'button';
+        dayBtn.textContent = d;
+        const isActive = d === safeDay;
+        dayBtn.className = `py-1 rounded text-[11px] font-mono border transition ${
+          isActive
+            ? 'bg-brand-600 border-brand-400 text-white font-bold shadow'
+            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+        }`;
+        dayBtn.onclick = () => {
+          daySelect.value = dStr;
+          applyEasyDatePickerChange();
+        };
+        quickDayGrid.appendChild(dayBtn);
+      }
+    }
+
+    function parseTimestampParts(isoStr) {
+      // Expected format: YYYY-MM-DDTHH:mm:ss+03:00
+      const match = String(isoStr).trim().match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}(?::\d{2})?)/);
+      if (match) {
+        let timePart = match[4];
+        if (timePart.length === 5) timePart += ':00';
+        return {
+          year: match[1],
+          month: match[2],
+          day: match[3],
+          time: timePart
+        };
+      }
+      const fallback = getFormattedTimestampPlus3(new Date());
+      return parseTimestampParts(fallback);
+    }
+
+    function syncEasyDatePickerFromTimestamp(isoStr) {
+      const parts = parseTimestampParts(isoStr);
+      const yearSelect = document.getElementById('pickerYearSelect');
+      const monthSelect = document.getElementById('pickerMonthSelect');
+      const timeInput = document.getElementById('pickerTimeInput');
+
+      if (!yearSelect || !monthSelect || !timeInput) return;
+
+      // Ensure year option exists
+      if (![...yearSelect.options].some(o => o.value === parts.year)) {
+        const opt = document.createElement('option');
+        opt.value = parts.year;
+        opt.textContent = parts.year;
+        yearSelect.appendChild(opt);
+      }
+
+      yearSelect.value = parts.year;
+      monthSelect.value = parts.month;
+      populateDayOptions(parts.year, parts.month, parts.day);
+      timeInput.value = parts.time;
+    }
+
+    function applyEasyDatePickerChange() {
+      // Uncheck auto-now when user manually picks a date
+      document.getElementById('autoNowToggle').checked = false;
+
+      const year = document.getElementById('pickerYearSelect').value;
+      const month = document.getElementById('pickerMonthSelect').value;
+      let day = document.getElementById('pickerDaySelect').value;
+      let time = document.getElementById('pickerTimeInput').value || '03:34:59';
+
+      if (time.length === 5) time += ':00';
+
+      const maxDays = getDaysInMonth(year, month);
+      if (Number(day) > maxDays) {
+        day = String(maxDays).padStart(2, '0');
+      }
+
+      populateDayOptions(year, month, day);
+
+      const formatted = `${year}-${month}-${day}T${time}+03:00`;
+      document.getElementById('addedAtInput').value = formatted;
+      handleLivePreview();
+    }
+
+    function stepPickerField(field, delta) {
+      const parts = parseTimestampParts(document.getElementById('addedAtInput').value);
+      const dt = new Date(
+        Number(parts.year),
+        Number(parts.month) - 1,
+        Number(parts.day)
+      );
+
+      if (field === 'year') dt.setFullYear(dt.getFullYear() + delta);
+      if (field === 'month') dt.setMonth(dt.getMonth() + delta);
+      if (field === 'day') dt.setDate(dt.getDate() + delta);
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const newIso = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${parts.time}+03:00`;
+
+      document.getElementById('autoNowToggle').checked = false;
+      document.getElementById('addedAtInput').value = newIso;
+      syncEasyDatePickerFromTimestamp(newIso);
+      handleLivePreview();
+    }
+
+    function shiftCurrentDateDays(deltaDays) {
+      stepPickerField('day', deltaDays);
+    }
+
+    function applyQuickDatePreset(offsetDays = 0) {
+      const now = new Date();
+      if (offsetDays !== 0) {
+        now.setDate(now.getDate() + offsetDays);
+      }
+      const iso = getFormattedTimestampPlus3(now);
+      document.getElementById('autoNowToggle').checked = false;
+      document.getElementById('addedAtInput').value = iso;
+      syncEasyDatePickerFromTimestamp(iso);
+      handleLivePreview();
+      showToast(offsetDays === 0 ? 'Set date to Today' : 'Set date to Yesterday', 'info');
+    }
+
+    function toggleDatePickerPanel(forceState) {
+      const panel = document.getElementById('easyDatePickerPanel');
+      const isHidden = panel.classList.contains('hidden');
+      const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
+
+      if (shouldShow) {
+        syncEasyDatePickerFromTimestamp(document.getElementById('addedAtInput').value);
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    /**************************************************************
+     * 3C. 9-DIGIT VALIDATION & DUPLICATE CHECK HELPERS
+     **************************************************************/
+    function isValidNineDigitOrderId(idStr) {
+      return /^\d{9}$/.test(String(idStr).trim());
+    }
+
+    function isDuplicateOrderAndProduct(orderId, productId, list = orderQueue) {
+      const cleanId = String(orderId).trim();
+      const cleanProd = String(productId).trim();
+      return list.some(item => String(item.id).trim() === cleanId && String(item.productId).trim() === cleanProd);
+    }
+
+    function sortOrdersNewestFirst(list) {
+      return [...list].sort((a, b) => {
+        const timeA = Date.parse(a.addedAt);
+        const timeB = Date.parse(b.addedAt);
+        if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
+          return timeB - timeA; // Newest date on top
+        }
+        return String(b.addedAt).localeCompare(String(a.addedAt));
+      });
+    }
+
+    function onSingleOrderIdInput(inputEl) {
+      // Strip non-digits automatically so the user can only type numbers up to 9 digits
+      const digitsOnly = inputEl.value.replace(/\D/g, '').slice(0, 9);
+      if (inputEl.value !== digitsOnly) {
+        inputEl.value = digitsOnly;
+      }
+
+      const len = digitsOnly.length;
+      const badge = document.getElementById('singleDigitBadge');
+      const msg = document.getElementById('singleOrderValidationMsg');
+      const currentProduct = document.getElementById('productSelect').value || 'english';
+
+      badge.textContent = `${len} / 9 digits`;
+
+      if (len === 0) {
+        badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
+        msg.innerHTML = `<i class="fa-solid fa-shield-halved text-brand-400"></i><span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>`;
+        msg.className = 'text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5';
+      } else if (len < 9) {
+        badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30';
+        msg.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400"></i><span>Order number needs ${9 - len} more digit${9 - len === 1 ? '' : 's'} (must be 9 digits).</span>`;
+        msg.className = 'text-[11px] text-amber-300 mt-1.5 flex items-center gap-1.5';
+      } else {
+        // Exactly 9 digits: check if duplicate with current product
+        if (isDuplicateOrderAndProduct(digitsOnly, currentProduct)) {
+          badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40';
+          msg.innerHTML = `<i class="fa-solid fa-ban text-rose-400"></i><span>Duplicate! Order #${digitsOnly} with product "${currentProduct}" is already in the queue.</span>`;
+          msg.className = 'text-[11px] text-rose-400 mt-1.5 flex items-center gap-1.5 font-medium';
+        } else {
+          badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+          msg.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>Valid 9-digit Order ID — Ready to generate.</span>`;
+          msg.className = 'text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1.5';
+        }
+      }
+
+      handleLivePreview();
+    }
+
+    function onBulkInputUpdate() {
+      const rawBulk = document.getElementById('bulkIdsInput').value;
+      const tokens = rawBulk.split(/[\n,\s]+/).map(s => s.trim()).filter(Boolean);
+      const validTokens = tokens.filter(isValidNineDigitOrderId);
+      const invalidCount = tokens.length - validTokens.length;
+
+      const badge = document.getElementById('bulkStatsBadge');
+      if (badge) {
+        badge.textContent = `${validTokens.length} valid (9-digit) • ${invalidCount} invalid`;
+        badge.className = invalidCount > 0
+          ? 'text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30'
+          : 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      }
+      handleLivePreview();
+    }
+
+    /**************************************************************
+     * 4. PRODUCT SELECTORS & CATALOG MANAGEMENT
+     **************************************************************/
+    function renderProductSelectors(selectedKey) {
+      const selectEl = document.getElementById('productSelect');
+      const quickCardsEl = document.getElementById('productQuickCards');
+      const countBadge = document.getElementById('productCountBadge');
+
+      const keys = Object.keys(productsCatalog);
+      countBadge.textContent = keys.length;
+
+      if (!selectedKey || !productsCatalog[selectedKey]) {
+        selectedKey = keys[0] || 'english';
+      }
+
+      // Render Dropdown
+      selectEl.innerHTML = '';
+      keys.forEach((key) => {
+        const prod = productsCatalog[key];
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = `${key} — ${prod.name} (${prod.price})`;
+        if (key === selectedKey) opt.selected = true;
+        selectEl.appendChild(opt);
+      });
+
+      // Render Quick Click Cards
+      quickCardsEl.innerHTML = '';
+      keys.forEach((key) => {
+        const prod = productsCatalog[key];
+        const isSelected = key === selectedKey;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => selectProductKey(key);
+        btn.className = `text-left p-2.5 rounded-xl border transition flex flex-col justify-between gap-1 ${
+          isSelected
+            ? 'bg-brand-600/20 border-brand-500 text-white shadow-sm shadow-brand-500/10'
+            : 'bg-slate-950/70 border-slate-800/90 text-slate-300 hover:border-slate-700 hover:bg-slate-900'
+        }`;
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full gap-1">
+            <span class="font-mono text-xs font-bold ${isSelected ? 'text-brand-300' : 'text-slate-400'}">${escapeHtml(key)}</span>
+            <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-emerald-400 border border-slate-800">${prod.price}</span>
+          </div>
+          <div class="font-arabic text-xs font-semibold truncate w-full" dir="rtl">${escapeHtml(prod.name)}</div>
+        `;
+        quickCardsEl.appendChild(btn);
+      });
+
+      updateProductPriceHint(selectedKey);
+      renderCatalogModalList();
+    }
+
+    function selectProductKey(key) {
+      const selectEl = document.getElementById('productSelect');
+      selectEl.value = key;
+      renderProductSelectors(key);
+      onSingleOrderIdInput(document.getElementById('orderIdInput'));
+      handleLivePreview();
+    }
+
+    function onProductSelectChange(key) {
+      renderProductSelectors(key);
+      onSingleOrderIdInput(document.getElementById('orderIdInput'));
+      handleLivePreview();
+    }
+
+    function updateProductPriceHint(key) {
+      const hint = document.getElementById('selectedProductPriceHint');
+      const prod = productsCatalog[key];
+      if (prod) {
+        hint.textContent = `${prod.name} • Default Price: ${prod.price}`;
+      }
+    }
+
+    function toggleCatalogModal(show) {
+      const modal = document.getElementById('catalogModal');
+      if (show) {
+        renderCatalogModalList();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function renderCatalogModalList() {
+      const container = document.getElementById('catalogList');
+      if (!container) return;
+      const keys = Object.keys(productsCatalog);
+      container.innerHTML = '';
+
+      keys.forEach((key) => {
+        const item = productsCatalog[key];
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5';
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-xs font-bold text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2.5 py-1 rounded-lg">${escapeHtml(key)}</span>
+            <div>
+              <div class="font-arabic text-sm font-semibold text-white">${escapeHtml(item.name)}</div>
+              <div class="text-xs font-mono text-emerald-400">Price: ${item.price}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="populateEditProduct('${escapeHtml(key)}')" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            ${
+              keys.length > 1
+                ? `<button type="button" onclick="deleteProductFromCatalog('${escapeHtml(key)}')" class="text-xs text-slate-400 hover:text-rose-400 px-2 py-1 rounded hover:bg-slate-800 transition" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>`
+                : ''
+            }
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function populateEditProduct(key) {
+      const prod = productsCatalog[key];
+      if (!prod) return;
+      document.getElementById('newProdKey').value = key;
+      document.getElementById('newProdName').value = prod.name;
+      document.getElementById('newProdPrice').value = prod.price;
+    }
+
+    function handleAddProduct(e) {
+      e.preventDefault();
+      const key = document.getElementById('newProdKey').value.trim();
+      const name = document.getElementById('newProdName').value.trim();
+      const price = Number(document.getElementById('newProdPrice').value);
+
+      if (!key || !name || isNaN(price)) return;
+
+      productsCatalog[key] = { name, price };
+      saveCatalogToStorage();
+      renderProductSelectors(key);
+      handleLivePreview();
+
+      document.getElementById('addProductForm').reset();
+      showToast(`Saved product "${key}"`, 'success');
+    }
+
+    function deleteProductFromCatalog(key) {
+      if (Object.keys(productsCatalog).length <= 1) return;
+      delete productsCatalog[key];
+      saveCatalogToStorage();
+      renderProductSelectors(Object.keys(productsCatalog)[0]);
+      handleLivePreview();
+      showToast(`Removed product "${key}"`, 'info');
+    }
+
+    function resetDefaultCatalog() {
+      productsCatalog = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      saveCatalogToStorage();
+      renderProductSelectors('english');
+      handleLivePreview();
+      showToast('Restored default 4 products', 'info');
+    }
+
+    /**************************************************************
+     * 5. FORM CONTROLS (STATUS, EDIT PRICE, ENTRY MODE)
+     **************************************************************/
+    function switchEntryMode(mode) {
+      currentEntryMode = mode;
+      const singlePanel = document.getElementById('singleEntryPanel');
+      const bulkPanel = document.getElementById('bulkEntryPanel');
+      const singleBtn = document.getElementById('tabSingleBtn');
+      const bulkBtn = document.getElementById('tabBulkBtn');
+      const primaryBtnText = document.getElementById('primaryActionBtnText');
+
+      if (mode === 'single') {
+        singlePanel.classList.remove('hidden');
+        bulkPanel.classList.add('hidden');
+        singleBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow';
+        bulkBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60';
+        primaryBtnText.textContent = 'Generate & Add to List';
+      } else {
+        singlePanel.classList.add('hidden');
+        bulkPanel.classList.remove('hidden');
+        bulkBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow';
+        singleBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60';
+        primaryBtnText.textContent = 'Generate & Add All Bulk Orders';
+      }
+      handleLivePreview();
+    }
+
+    function setOrderStatus(status) {
+      currentStatus = status;
+      const appBtn = document.getElementById('statusApprovedBtn');
+      const rejBtn = document.getElementById('statusRejectedBtn');
+
+      if (status === 'approved') {
+        appBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-emerald-600 text-white shadow';
+        rejBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white';
+      } else {
+        rejBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-rose-600 text-white shadow';
+        appBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white';
+      }
+      handleLivePreview();
+    }
+
+    function onEditPriceToggle() {
+      const enabled = document.getElementById('editPriceToggle').checked;
+      const wrapper = document.getElementById('salePriceWrapper');
+      const card = document.getElementById('editPriceCard');
+
+      if (enabled) {
+        wrapper.classList.remove('opacity-40', 'pointer-events-none');
+        card.classList.add('border-amber-500/50', 'bg-amber-500/5');
+      } else {
+        wrapper.classList.add('opacity-40', 'pointer-events-none');
+        card.classList.remove('border-amber-500/50', 'bg-amber-500/5');
+      }
+      handleLivePreview();
+    }
+
+    function setSalePriceValue(val) {
+      document.getElementById('editPriceToggle').checked = true;
+      document.getElementById('salePriceInput').value = val;
+      onEditPriceToggle();
+    }
+
+    function setSalePriceToProductDefault() {
+      const prodKey = document.getElementById('productSelect').value;
+      const prod = productsCatalog[prodKey];
+      const defaultPrice = prod ? prod.price : 0;
+      setSalePriceValue(defaultPrice);
+    }
+
+    /**************************************************************
+     * 6. ORDER OBJECT CONSTRUCTION (EXACT FIELD ORDER)
+     **************************************************************/
+    function buildOrderObjectFromSpec(spec) {
+      // Exact key insertion order as requested:
+      // id, productId, addedAt, status, [salePrice if editPrice], commissionRate, warrantyDays
+      const obj = {
+        id: String(spec.id).trim(),
+        productId: spec.productId,
+        addedAt: spec.addedAt,
+        status: spec.status
+      };
+
+      if (spec.editPrice) {
+        const numericSalePrice = Number(spec.salePrice);
+        obj.salePrice = isNaN(numericSalePrice) ? 0 : numericSalePrice;
+      }
+
+      const comm = Number(spec.commissionRate);
+      const warr = Number(spec.warrantyDays);
+
+      obj.commissionRate = isNaN(comm) ? 30 : comm;
+      obj.warrantyDays = isNaN(warr) ? 14 : warr;
+
+      return obj;
+    }
+
+    function readCurrentFormSpec(overrideId = null) {
+      const idVal = overrideId !== null
+        ? overrideId
+        : (document.getElementById('orderIdInput').value.trim() || '295332280');
+
+      const productId = document.getElementById('productSelect').value || 'english';
+      const addedAt = document.getElementById('addedAtInput').value.trim() || getFormattedTimestampPlus3();
+      const editPrice = document.getElementById('editPriceToggle').checked;
+      const salePrice = Number(document.getElementById('salePriceInput').value || 0);
+      const commissionRate = Number(document.getElementById('commissionInput').value ?? 30);
+      const warrantyDays = Number(document.getElementById('warrantyInput').value ?? 14);
+
+      return {
+        uid: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+        id: idVal,
+        productId,
+        addedAt,
+        status: currentStatus,
+        editPrice,
+        salePrice,
+        commissionRate,
+        warrantyDays
+      };
+    }
+
+    /**************************************************************
+     * 7. ADDING ORDERS TO QUEUE & BULK PARSING
+     **************************************************************/
+    function addOrderFromForm() {
+      if (document.getElementById('autoNowToggle').checked) {
+        refreshTimestampNow(false);
+      }
+
+      const selectedProduct = document.getElementById('productSelect').value || 'english';
+
+      if (currentEntryMode === 'single') {
+        const rawId = document.getElementById('orderIdInput').value.trim();
+
+        if (!rawId) {
+          showToast('Please enter a 9-digit Order Number (id) first', 'warning');
+          document.getElementById('orderIdInput').focus();
+          return;
+        }
+
+        if (!isValidNineDigitOrderId(rawId)) {
+          showToast(`Invalid Order ID "${rawId}" — Must be strictly 9 numeric digits!`, 'warning');
+          document.getElementById('orderIdInput').focus();
+          return;
+        }
+
+        if (isDuplicateOrderAndProduct(rawId, selectedProduct)) {
+          showToast(`Duplicate blocked: Order #${rawId} with product "${selectedProduct}" already exists!`, 'warning');
+          document.getElementById('orderIdInput').focus();
+          return;
+        }
+
+        const spec = readCurrentFormSpec(rawId);
+        orderQueue.push(spec);
+        orderQueue = sortOrdersNewestFirst(orderQueue);
+
+        // Clear Order ID input for fast sequential entry
+        const idInput = document.getElementById('orderIdInput');
+        idInput.value = '';
+        onSingleOrderIdInput(idInput);
+        idInput.focus();
+
+        renderOrderQueue();
+        handleLivePreview();
+        showToast(`Added Order #${spec.id} (${selectedProduct})`, 'success');
+      } else {
+        // Bulk mode with 9-digit validation & duplicate prevention
+        const rawBulk = document.getElementById('bulkIdsInput').value;
+        const tokens = rawBulk
+          .split(/[\n,\s]+/)
+          .map(s => s.trim())
+          .filter(Boolean);
+
+        if (tokens.length === 0) {
+          showToast('Please paste at least one 9-digit Order ID in Bulk mode', 'warning');
+          document.getElementById('bulkIdsInput').focus();
+          return;
+        }
+
+        let addedCount = 0;
+        let invalidIds = [];
+        let duplicateIds = [];
+
+        tokens.forEach((token) => {
+          if (!isValidNineDigitOrderId(token)) {
+            invalidIds.push(token);
+            return;
+          }
+          if (isDuplicateOrderAndProduct(token, selectedProduct, orderQueue)) {
+            duplicateIds.push(token);
+            return;
+          }
+          orderQueue.push(readCurrentFormSpec(token));
+          addedCount++;
+        });
+
+        orderQueue = sortOrdersNewestFirst(orderQueue);
+
+        document.getElementById('bulkIdsInput').value = '';
+        onBulkInputUpdate();
+        renderOrderQueue();
+        handleLivePreview();
+
+        if (addedCount > 0 && invalidIds.length === 0 && duplicateIds.length === 0) {
+          showToast(`Added ${addedCount} valid orders (sorted newest first)`, 'success');
+        } else {
+          const summaryParts = [`Added: ${addedCount}`];
+          if (duplicateIds.length > 0) summaryParts.push(`Skipped ${duplicateIds.length} duplicate(s)`);
+          if (invalidIds.length > 0) summaryParts.push(`Skipped ${invalidIds.length} non-9-digit ID(s)`);
+          showToast(summaryParts.join(' • '), addedCount > 0 ? 'info' : 'warning');
+        }
+      }
+    }
+
+    function generateInstantOnly() {
+      if (currentEntryMode === 'single' && orderQueue.length === 0) {
+        const rawId = document.getElementById('orderIdInput').value.trim();
+        if (rawId && !isValidNineDigitOrderId(rawId)) {
+          showToast('Order Number must be exactly 9 digits before copying!', 'warning');
+          document.getElementById('orderIdInput').focus();
+          return;
+        }
+      }
+      if (document.getElementById('autoNowToggle').checked) {
+        refreshTimestampNow(false);
+      }
+      handleLivePreview();
+      copyGeneratedJson();
+    }
+
+    function renderOrderQueue() {
+      // Always keep orderQueue sorted with newest addedAt dates on top
+      orderQueue = sortOrdersNewestFirst(orderQueue);
+
+      const container = document.getElementById('orderQueueContainer');
+      const countBadge = document.getElementById('queueCountBadge');
+      const clearBtn = document.getElementById('clearQueueBtn');
+      const bulkPriceBtn = document.getElementById('bulkTogglePriceBtn');
+
+      countBadge.textContent = orderQueue.length;
+
+      if (orderQueue.length === 0) {
+        clearBtn.classList.add('hidden');
+        bulkPriceBtn.classList.add('hidden');
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 border border-dashed border-slate-800 rounded-xl bg-slate-950/40">
+            <div class="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-2 text-slate-500">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <p class="text-xs font-medium text-slate-300">No queued orders yet — Live Preview shows current form</p>
+            <p class="text-[11px] text-slate-500 mt-1">Type an Order ID above and press <span class="text-slate-300 font-mono">Enter</span> or click <span class="text-brand-400">Generate &amp; Add to List</span> to build multiple orders.</p>
+          </div>
+        `;
+        return;
+      }
+
+      clearBtn.classList.remove('hidden');
+      bulkPriceBtn.classList.remove('hidden');
+      container.innerHTML = '';
+
+      orderQueue.forEach((item, index) => {
+        const prod = productsCatalog[item.productId];
+        const prodLabel = prod ? prod.name : item.productId;
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-950/90 border border-slate-800/90 hover:border-slate-700 rounded-xl p-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 transition';
+        card.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="text-xs font-mono text-slate-500">#${index + 1}</span>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-mono text-sm font-bold text-white">${escapeHtml(item.id)}</span>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-500/15 text-brand-300 border border-brand-500/30">${escapeHtml(item.productId)}</span>
+                <span class="font-arabic text-xs text-slate-300" dir="rtl">${escapeHtml(prodLabel)}</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded ${
+                  item.status === 'approved'
+                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                }">${item.status}</span>
+                ${
+                  item.editPrice
+                    ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">salePrice: ${item.salePrice}</span>`
+                    : ''
+                }
+              </div>
+              <div class="text-[11px] font-mono text-slate-500 mt-1">
+                ${escapeHtml(item.addedAt)} • comm: ${item.commissionRate} • warranty: ${item.warrantyDays}d
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 ml-auto">
+            <button
+              type="button"
+              onclick="toggleQueueItemEditPrice(${index})"
+              class="text-xs px-2.5 py-1.5 rounded-lg border transition font-mono ${
+                item.editPrice
+                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+              }"
+              title="Toggle salePrice on this order"
+            >
+              <i class="fa-solid fa-tag mr-1"></i>Price
+            </button>
+            <button
+              type="button"
+              onclick="toggleQueueItemStatus(${index})"
+              class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
+              title="Switch approved / rejected"
+            >
+              <i class="fa-solid fa-repeat"></i>
+            </button>
+            <button
+              type="button"
+              onclick="removeOrderFromQueue(${index})"
+              class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-800 transition"
+              title="Remove order"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleQueueItemEditPrice(index) {
+      if (!orderQueue[index]) return;
+      orderQueue[index].editPrice = !orderQueue[index].editPrice;
+      renderOrderQueue();
+      handleLivePreview();
+    }
+
+    function toggleQueueItemStatus(index) {
+      if (!orderQueue[index]) return;
+      orderQueue[index].status = orderQueue[index].status === 'approved' ? 'rejected' : 'approved';
+      renderOrderQueue();
+      handleLivePreview();
+    }
+
+    function removeOrderFromQueue(index) {
+      orderQueue.splice(index, 1);
+      renderOrderQueue();
+      handleLivePreview();
+    }
+
+    function clearOrderQueue() {
+      orderQueue = [];
+      renderOrderQueue();
+      handleLivePreview();
+      showToast('Cleared order queue', 'info');
+    }
+
+    function toggleAllQueueSalePrice() {
+      if (orderQueue.length === 0) return;
+      const anyUnchecked = orderQueue.some(o => !o.editPrice);
+      const currentSalePrice = Number(document.getElementById('salePriceInput').value || 0);
+      orderQueue.forEach(o => {
+        o.editPrice = anyUnchecked;
+        if (anyUnchecked) o.salePrice = currentSalePrice;
+      });
+      renderOrderQueue();
+      handleLivePreview();
+    }
+
+    /**************************************************************
+     * 8. JSON STRING GENERATION & SYNTAX HIGHLIGHTING
+     **************************************************************/
+    function setOutputFormat(fmt) {
+      outputFormat = fmt;
+      const btns = {
+        snippet: document.getElementById('fmtSnippetBtn'),
+        array: document.getElementById('fmtArrayBtn'),
+        object: document.getElementById('fmtObjectBtn')
+      };
+      Object.keys(btns).forEach((k) => {
+        if (k === fmt) {
+          btns[k].className = 'px-2.5 py-1 rounded-lg transition bg-brand-600 text-white';
+        } else {
+          btns[k].className = 'px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white';
+        }
+      });
+      handleLivePreview();
+    }
+
+    function getTargetOrderObjects() {
+      // If user has items in queue, sort them newest date first and generate from queue.
+      if (orderQueue.length > 0) {
+        const sortedQueue = sortOrdersNewestFirst(orderQueue);
+        return sortedQueue.map(buildOrderObjectFromSpec);
+      }
+
+      if (currentEntryMode === 'bulk') {
+        const rawBulk = document.getElementById('bulkIdsInput').value;
+        const ids = rawBulk
+          .split(/[\n,\s]+/)
+          .map(s => s.trim())
+          .filter(isValidNineDigitOrderId);
+
+        // Deduplicate within preview batch for the selected product
+        const uniqueIds = [...new Set(ids)];
+        if (uniqueIds.length > 0) {
+          const specs = uniqueIds.map(idStr => readCurrentFormSpec(idStr));
+          return sortOrdersNewestFirst(specs).map(buildOrderObjectFromSpec);
+        }
+      }
+
+      return [buildOrderObjectFromSpec(readCurrentFormSpec())];
+    }
+
+    function formatOrderObjectsToString(objects) {
+      if (outputFormat === 'array') {
+        return JSON.stringify(objects, null, 2);
+      }
+
+      if (outputFormat === 'object') {
+        if (objects.length === 1) {
+          return JSON.stringify(objects[0], null, 2);
+        }
+        return objects.map(o => JSON.stringify(o, null, 2)).join(',\n');
+      }
+
+      // Default 'snippet' format: matches user's example `{ ... },` with trailing comma
+      return objects.map(o => `${JSON.stringify(o, null, 2)},`).join('\n');
+    }
+
+    function syntaxHighlightJson(jsonStr) {
+      const escaped = escapeHtml(jsonStr);
+      return escaped.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        (match) => {
+          let cls = 'json-number';
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = 'json-key';
+            } else {
+              cls = 'json-string';
+            }
+          } else if (/true|false/.test(match)) {
+            cls = 'json-boolean';
+          }
+          return `<span class="${cls}">${match}</span>`;
+        }
+      );
+    }
+
+    function handleLivePreview() {
+      const objects = getTargetOrderObjects();
+      const formattedCode = formatOrderObjectsToString(objects);
+
+      const preEl = document.getElementById('jsonHighlightedPre');
+      const rawEl = document.getElementById('jsonRawTextarea');
+      const statsEl = document.getElementById('jsonLineStats');
+      const subtextEl = document.getElementById('outputModeSubtext');
+
+      preEl.innerHTML = syntaxHighlightJson(formattedCode);
+      rawEl.value = formattedCode;
+
+      const count = objects.length;
+      const sourceLabel = orderQueue.length > 0 ? 'from Queued List' : 'Live Form Preview';
+      statsEl.textContent = `${count} ${count === 1 ? 'order' : 'orders'} • ${sourceLabel}`;
+      subtextEl.textContent = orderQueue.length > 0
+        ? `Showing ${count} queued ${count === 1 ? 'order' : 'orders'}`
+        : 'Live preview from form inputs above';
+    }
+
+    function toggleRawTextView() {
+      isRawView = !isRawView;
+      const preEl = document.getElementById('jsonHighlightedPre');
+      const rawEl = document.getElementById('jsonRawTextarea');
+      const btn = document.getElementById('rawViewToggleBtn');
+
+      if (isRawView) {
+        preEl.classList.add('hidden');
+        rawEl.classList.remove('hidden');
+        btn.innerHTML = '<i class="fa-solid fa-eye"></i><span>Highlighted View</span>';
+      } else {
+        rawEl.classList.add('hidden');
+        preEl.classList.remove('hidden');
+        btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i><span>Raw Text Mode</span>';
+      }
+    }
+
+    /**************************************************************
+     * 9. COPY & DOWNLOAD ACTIONS
+     **************************************************************/
+    function getCurrentOutputText() {
+      const rawEl = document.getElementById('jsonRawTextarea');
+      return rawEl.value;
+    }
+
+    function copyGeneratedJson() {
+      const code = getCurrentOutputText();
+      const tempArea = document.createElement('textarea');
+      tempArea.value = code;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById('copyJsonBtn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i><span>Copied to Clipboard!</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+        }, 1600);
+        showToast('JSON code copied to clipboard!', 'success');
+      } catch (err) {
+        showToast('Unable to copy automatically — select text in Raw Mode', 'warning');
+      }
+      document.body.removeChild(tempArea);
+    }
+
+    function downloadGeneratedJson() {
+      const code = getCurrentOutputText();
+      const blob = new Blob([code], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+      a.href = url;
+      a.download = `orders-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded JSON file', 'success');
+    }
+
+    async function pasteClipboardToId() {
+      const input = document.getElementById('orderIdInput');
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            input.value = text.replace(/\D/g, '').slice(0, 9);
+            onSingleOrderIdInput(input);
+            showToast('Pasted Order ID from clipboard', 'info');
+            return;
+          }
+        }
+      } catch (_) {
+        // Fallback if iframe blocks clipboard read
+      }
+      input.focus();
+      showToast('Press Ctrl+V / Cmd+V to paste Order ID', 'info');
+    }
+
+    /**************************************************************
+     * 10. SAMPLE LOADER, RESET & UTILITIES
+     **************************************************************/
+    function loadSampleOrder() {
+      switchEntryMode('single');
+      const idInput = document.getElementById('orderIdInput');
+      idInput.value = '295332280';
+      selectProductKey('english');
+      setOrderStatus('approved');
+      document.getElementById('commissionInput').value = '30';
+      document.getElementById('warrantyInput').value = '14';
+      document.getElementById('addedAtInput').value = '2026-10-24T03:34:59+03:00';
+      syncEasyDatePickerFromTimestamp('2026-10-24T03:34:59+03:00');
+      onSingleOrderIdInput(idInput);
+      handleLivePreview();
+      showToast('Loaded sample order #295332280', 'info');
+    }
+
+    function resetFormDefaults() {
+      const idInput = document.getElementById('orderIdInput');
+      idInput.value = '';
+      onSingleOrderIdInput(idInput);
+      document.getElementById('bulkIdsInput').value = '';
+      onBulkInputUpdate();
+      selectProductKey('english');
+      setOrderStatus('approved');
+      document.getElementById('editPriceToggle').checked = false;
+      document.getElementById('salePriceInput').value = '0';
+      onEditPriceToggle();
+      document.getElementById('commissionInput').value = '30';
+      document.getElementById('warrantyInput').value = '14';
+      refreshTimestampNow(false);
+      handleLivePreview();
+      showToast('Reset form fields to default values', 'info');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+
+      const colorMap = {
+        success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500/40 text-amber-200',
+        info: 'bg-slate-900/95 border-slate-700 text-slate-200'
+      };
+      const iconMap = {
+        success: 'fa-circle-check text-emerald-400',
+        warning: 'fa-triangle-exclamation text-amber-400',
+        info: 'fa-circle-info text-brand-400'
+      };
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-xl border shadow-xl text-xs font-medium backdrop-blur-md transition-all duration-300 ${colorMap[type] || colorMap.info}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${iconMap[type] || iconMap.info}"></i>
+        <span>${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(() => toast.remove(), 250);
+      }, 2400);
+    }
+  </script>
+</body>
+</html>
