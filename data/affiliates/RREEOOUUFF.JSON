@@ -6,12 +6,23 @@
     "couponCode": "RE10",
     "orders": [
 
-    
+     {
+   "id": "ORDER-001",
+   "productId": "english",
+    "addedAt": "2026-08-16T03:34:59+03:00",
+     "status": "approved",
+    "salePrice": 49,
+    "commissionRate": 30,
+    "warrantyDays": 14
+  }
   
   ],
   "transfers": [
 
-    
+    {
+    "date": "2026-10-12",
+    "amount": 14.70
+  }
 
   ]
 }
