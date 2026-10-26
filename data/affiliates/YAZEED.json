@@ -6,33 +6,10 @@
     "couponCode": "YZ10",
     "orders": [
 
-{
-  "id": "295650876",
-  "productId": "english",
-  "addedAt": "2026-10-26T12:25:17+03:00",
-  "status": "approved",
-  "commissionRate": 30,
-  "warrantyDays": 0
-},
-{
-  "id": "295617166",
-  "productId": "english",
-  "addedAt": "2026-10-25T12:24:00+03:00",
-  "status": "approved",
-  "commissionRate": 30,
-  "warrantyDays": 0
-},
 
-      {
-  "id": "295561267",
-  "productId": "english",
-  "addedAt": "2026-10-25T13:35:04+03:00",
-  "status": "approved",
-  "commissionRate": 30,
-  "warrantyDays": 0
-}
 
-  
+
+        
   ],
   "transfers": [
 
