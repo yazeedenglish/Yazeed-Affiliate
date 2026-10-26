@@ -29,7 +29,10 @@
     submit.disabled = true;
     submit.textContent = "جارٍ التحقق...";
     try {
-      const response = await fetch(`../data/affiliates/${encodeURIComponent(code)}.json`, { cache: "no-store" });
+      const response = await fetch(
+  new URL(`../data/affiliates/${encodeURIComponent(code)}.json`, window.location.href),
+  { cache: "no-store" }
+);
       if (!response.ok) throw new Error("not-found");
       const partner = await response.json();
       if (String(partner.code || "").toUpperCase() !== code || partner.password !== password || partner.active === false) {
