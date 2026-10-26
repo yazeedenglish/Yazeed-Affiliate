@@ -157,7 +157,7 @@ function renderOrders(orders) {
   function renderTransfers(transfers) {
     $("transfersCount").textContent = String(transfers.length);
     if (!transfers.length) {
-      $("transfersContent").innerHTML = emptyState("↔", "لا توجد حوالات حتى الآن", "ستظهر هنا تواريخ ومبالغ الحوالات البنكية التي تم تسجيلها");
+      $("transfersContent").innerHTML = emptyState("↔", "لا توجد حوالات حتى الآن", "ستظهر هنا تواريخ ومبالغ الحوالات البنكية");
       return;
     }
     const rows = transfers.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).map((transfer) =>
@@ -563,7 +563,15 @@ async function init() {
       throw new Error("Invalid or inactive partner");
     }
 
-    $("partnerName").textContent = partner.name || "الشريك";
+    const currentHour = new Date().getHours();
+
+const greeting =
+  currentHour >= 0 && currentHour < 12
+    ? "صباح الخير"
+    : "مساء الخير";
+
+$("greeting").textContent = greeting;
+$("partnerName").textContent = partner.name || "الشريك";
      const couponCode = String(partner.couponCode || "").trim();
 
     $("couponCode").textContent = couponCode || "غير مخصص";

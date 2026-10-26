@@ -1,7 +1,7 @@
 {
     "code": "REOUF",
     "password": "REOUF000",
-    "name": "Reouf",
+    "name": "ريوف",
     "active": true,
     "couponCode": "RE10",
     "orders": [
@@ -12,11 +12,6 @@
         
   ],
   "transfers": [
-
-    {
-    "date": "0000-00-00",
-    "amount": 0.00
-  }
 
   ]
 }
