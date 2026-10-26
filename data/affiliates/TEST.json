@@ -11,19 +11,17 @@
    "productId": "english",
     "addedAt": "2026-10-25T03:34:59+03:00",
      "status": "approved",
-     "salePrice": 0,
     "commissionRate": 30,
-    "warrantyDays": 0
+    "warrantyDays": 14
   },
 
                              {
    "id": "ORDER-001",
    "productId": "step",
-    "addedAt": "2026-01-01T03:34:59+03:00",
+    "addedAt": "2026-10-12T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
-    "salePrice": 0,
-    "warrantyDays": 0
+    "warrantyDays": 14
   },
 
                                {
@@ -32,7 +30,6 @@
     "addedAt": "2026-01-01T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
-    "salePrice": 0,
     "warrantyDays": 0
   }
 
@@ -42,7 +39,7 @@
 
     {
     "date": "2026-01-01",
-    "amount": 0.00
+    "amount": 29.70
   }
 
   ]

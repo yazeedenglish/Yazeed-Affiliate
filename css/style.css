@@ -139,6 +139,9 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .data-table th { color: var(--ink-soft); background: color-mix(in srgb, var(--paper) 55%, var(--card)); font-size: 12px; font-weight: 900; }
 .data-table tbody tr:last-child td { border-bottom: 0; }
 .data-table td.amount { color: var(--success); font-weight: 900; }
+.data-table td.amount.pending {
+  color: #b6800b;
+}
 .empty-state { padding: 35px 20px 39px; text-align: center; }
 .empty-icon { width: 52px; height: 52px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 16px; background: var(--paper); color: var(--ink-soft); font-size: 23px; }
 .empty-state strong { display: block; font-size: 15px; font-weight: 900; }
@@ -719,4 +722,123 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   .performance-toggle-icon {
     transition: none;
   }
+}
+
+/* Affiliate order status colors */
+.status-pill {
+  background: #e8f5e9;
+  color: #276738;
+  border: 1px solid #c8e6cc;
+  transform: translateX(8px);
+}
+
+.status-pill.refunded {
+  /* Keep the existing refunded badge color */
+  border-color: #f2caca;
+  transform: translateX(0px);
+}
+
+.status-pill.pending {
+  background: #c58c111c;
+  color: #b6800b;
+  border-color: #c58c114b;
+  transform: translateX(6px);
+}
+
+/* Refunded commission: excluded from earnings */
+.commission-refunded {
+  color: rgb(201, 0, 0) !important;
+  text-decoration-color: #d64545;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.4px;
+  opacity: 0.85;
+}
+
+.status-pill.refunded {
+  position: relative;
+  left: 12px;
+  top: 0px;
+}
+
+/* Parent pill anchor */
+.status-pill.pending {
+  position: relative;
+  cursor: help;
+  -webkit-tap-highlight-color: transparent; /* Removes ugly blue flash on mobile tap */
+}
+
+/* Shared positioning & animation for both Box (::after) and Arrow (::before) */
+.status-pill.pending::after,
+.status-pill.pending::before {
+  position: absolute;
+  left: 50%;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: 
+    opacity 0.18s ease,
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.18s;
+}
+
+/* 1. The Tooltip Box */
+.status-pill.pending::after {
+  content: "الطلب في فترة الضمان الذهبي";
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(6px) scale(0.96);
+  transform-origin: bottom center;
+
+  /* Sizing & Balanced Wrapping */
+  width: max-content;
+  max-width: min(230px, 80vw); /* Prevents screen overflow on small phones */
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  /* Typography (Arabic RTL) */
+  direction: rtl;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.65;
+  text-align: center;
+  white-space: normal;
+  text-wrap: balance; /* Splits Arabic text into evenly sized lines */
+
+  /* Elevated Visuals & Shadow */
+  background: var(--card, #ffffff);
+  color: var(--ink, #1a1a1a);
+  border: 1px solid var(--line, #e5e7eb);
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 4px 10px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. The Little Pointer Arrow */
+.status-pill.pending::before {
+  content: "";
+  bottom: calc(100% + 5px); /* Sits right on the bottom edge of the box */
+  width: 9px;
+  height: 9px;
+  background: var(--card, #ffffff);
+  border-right: 1px solid var(--line, #e5e7eb);
+  border-bottom: 1px solid var(--line, #e5e7eb);
+  transform: translateX(-50%) translateY(6px) rotate(45deg);
+  z-index: 101; /* Overlaps the box's bottom border seamlessly */
+}
+
+/* Active State: Pop up into place */
+.status-pill.pending:hover::after,
+.status-pill.pending:focus::after,
+.status-pill.pending:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.status-pill.pending:hover::before,
+.status-pill.pending:focus::before,
+.status-pill.pending:focus-visible::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) rotate(45deg);
 }

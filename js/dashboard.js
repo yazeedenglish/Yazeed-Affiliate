@@ -61,15 +61,31 @@ function renderOrders(orders) {
   const pageOrders = orders.slice(startIndex, startIndex + ordersPerPage);
 
   const rows = pageOrders.map((order) => {
-    const status =
-      order.status === "refunded"
+     const status =
+      order.isRejected ||
+      ["rejected", "refunded"].includes(
+        String(order.status || "").toLowerCase()
+      )
         ? '<span class="status-pill refunded">مسترجع</span>'
-        : '<span class="status-pill">مكتمل</span>';
+        : order.isPending
+          ? '<span class="status-pill pending" tabindex="0" role="button" aria-label="معلّق: عرض التوضيح" aria-describedby="pending-status-tooltip">معلّق</span>'
+          : '<span class="status-pill">مكتمل</span>';
 
     return `<tr>
       <td>${window.YEAffiliate.escapeHtml(order.product || "منتج")}</td>
       <td>${window.YEAffiliate.formatDate(order.addedAt)}</td>
-      <td class="amount">${window.YEAffiliate.formatMoney(order.commission)}</td>
+      <td class="amount ${
+  order.isRejected ||
+  ["rejected", "refunded"].includes(
+    String(order.status || "").toLowerCase()
+  )
+    ? "commission-refunded"
+    : order.isPending
+      ? "pending"
+      : ""
+}">
+  ${window.YEAffiliate.formatMoney(order.commission)}
+</td>
       <td>${status}</td>
     </tr>`;
   }).join("");
@@ -557,46 +573,20 @@ async function init() {
       $("couponMessage").textContent =
         "";
     }
-
-    const now = Date.now();
-
-    // Filter orders using the existing warranty and refund rules
-    const eligibleOrders = (
+    
+    // Prepare all valid orders for display
+    const displayOrders = (
       Array.isArray(partner.orders) ? partner.orders : []
     )
       .filter((order) => {
-        const addedAt = new Date(order.addedAt).getTime();
-
-        if (!Number.isFinite(addedAt)) return false;
-
-        const warrantyDays = Number(order.warrantyDays ?? 15);
-const warrantyEndsAt = addedAt + warrantyDays * 24 * 60 * 60 * 1000;
-
-        if (now < warrantyEndsAt) return false;
-
-        // Refunds during the warranty period exclude the order.
-        // Refunds after the warranty do not automatically reverse commission.
-        if (order.status === "refunded") {
-          const refundedAt = new Date(
-            order.refundedAt || ""
-          ).getTime();
-
-          if (
-            !Number.isFinite(refundedAt) ||
-            refundedAt <= warrantyEndsAt
-          ) {
-            return false;
-          }
-        }
-
-        return true;
+        return Number.isFinite(
+          new Date(order.addedAt).getTime()
+        );
       })
       .map((order) => {
-        // Find the product using its ID in products.json
-        const product = products[order.productId];
 
-        // Use the recorded sale price when provided.
-        // Otherwise, use the product's price from products.json.
+        const product = products[order.productId];
+        
         const hasSalePrice =
           order.salePrice !== undefined &&
           order.salePrice !== null &&
@@ -616,25 +606,60 @@ const warrantyEndsAt = addedAt + warrantyDays * 24 * 60 * 60 * 1000;
           );
         }
 
-        // Calculate commission as a percentage
-        const orderCommissionRate = Number(order.commissionRate ?? 0);
-const commission = Number(
-  (salePrice * orderCommissionRate / 100).toFixed(2)
-);
+        const rate = Number(order.commissionRate ?? 0);
+
+        const commission = Number(
+          (salePrice * rate / 100).toFixed(2)
+        );
+
+        const addedAt = new Date(order.addedAt).getTime();
+
+        const parsedWarrantyDays = Number(
+          order.warrantyDays ?? 15
+        );
+
+        const warrantyDays =
+          Number.isFinite(parsedWarrantyDays) &&
+          parsedWarrantyDays >= 0
+            ? parsedWarrantyDays
+            : 15;
+
+        const warrantyEndsAt =
+          addedAt +
+          warrantyDays * 24 * 60 * 60 * 1000;
+
+        const normalizedStatus = String(
+          order.status || ""
+        ).toLowerCase();
+
+        const isRejected =
+          normalizedStatus === "rejected" ||
+          normalizedStatus === "refunded";
+
+        const isPending =
+          !isRejected &&
+          Date.now() < warrantyEndsAt;
 
         return {
           ...order,
           product: product.name || "منتج",
-          commission
+          commission,
+          isRejected,
+          isPending
         };
       });
+
+    // Only completed, non-refunded orders earn commission
+    const eligibleOrders = displayOrders.filter(
+      (order) => !order.isRejected && !order.isPending
+    );
 
     // Load recorded bank transfers
     const transfers = Array.isArray(partner.transfers)
       ? partner.transfers
       : [];
 
-    // Calculate the total earned commission
+    // Calculate earned commission
     const eligibleCommission = eligibleOrders.reduce(
       (sum, order) => sum + order.commission,
       0
@@ -663,10 +688,11 @@ const commission = Number(
     $("availableBalance").textContent =
       window.YEAffiliate.formatMoney(availableBalance);
 
-    // Keep your existing pagination and table rendering
-    renderOrders(eligibleOrders);
+    // Show every valid order, including pending and rejected orders
+    renderOrders(displayOrders);
     renderTransfers(transfers);
     initPerformance(eligibleOrders);
+
 
   } catch (error) {
     console.error("Dashboard loading error:", error);
