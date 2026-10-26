@@ -52,7 +52,7 @@ function renderOrders(orders) {
     ordersContent.innerHTML = emptyState(
       "▤",
       "لا توجد طلبات حتى الآن",
-      "ستظهر طلباتك هنا بعد انتهاء فترة الضمان الذهبي"
+      ""
     );
     return;
   }
