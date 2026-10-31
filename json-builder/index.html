@@ -213,6 +213,24 @@
               <i class="fa-solid fa-shield-halved text-brand-400"></i>
               <span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>
             </p>
+
+            <!-- Discount Code Setting for This Single Order -->
+            <div class="mt-3 bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <label for="singleDiscountCodeSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Discount Code (<code class="text-brand-400 font-mono">discountCode</code>)
+                </label>
+                <p class="text-[11px] text-slate-500 mt-1">Choose whether this single order has a discount code.</p>
+              </div>
+              <select
+                id="singleDiscountCodeSelect"
+                onchange="handleLivePreview()"
+                class="bg-slate-900 border border-slate-700 focus:border-brand-500 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none"
+              >
+                <option value="true" selected>true — Has discount code</option>
+                <option value="false">false — No discount code</option>
+              </select>
+            </div>
           </div>
 
           <!-- BULK ENTRY MODE (Hidden by default) -->
@@ -230,6 +248,25 @@
               oninput="onBulkInputUpdate()"
               class="w-full bg-slate-950 border border-slate-700/90 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-xl p-3.5 text-sm font-mono text-white placeholder-slate-600 transition outline-none"
             ></textarea>
+
+            <!-- Discount Code Setting for All Orders in This Bulk Batch -->
+            <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <label for="bulkDiscountCodeSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Discount Code (<code class="text-brand-400 font-mono">discountCode</code>)
+                </label>
+                <p class="text-[11px] text-slate-500 mt-1">This value will be applied to every order generated from the bulk IDs above.</p>
+              </div>
+              <select
+                id="bulkDiscountCodeSelect"
+                onchange="handleLivePreview()"
+                class="bg-slate-900 border border-slate-700 focus:border-brand-500 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none"
+              >
+                <option value="true" selected>true — Has discount code</option>
+                <option value="false">false — No discount code</option>
+              </select>
+            </div>
+
             <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
               <i class="fa-solid fa-filter text-brand-400"></i>
               <span>Only valid 9-digit numbers are accepted. Any duplicate Order ID + Product combinations are skipped.</span>
@@ -671,7 +708,7 @@
         <div class="p-3.5 bg-slate-950/90 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-circle-info text-brand-400"></i>
-            <span>When <strong>Edit Price</strong> is active, <code class="text-amber-300 font-mono">"salePrice"</code> is placed right below <code class="text-emerald-300 font-mono">"status"</code>.</span>
+            <span>Every order includes <code class="text-sky-300 font-mono">"discountCode"</code> (default <strong>true</strong>). When <strong>Edit Price</strong> is active, <code class="text-amber-300 font-mono">"salePrice"</code> stays directly below <code class="text-emerald-300 font-mono">"status"</code>.</span>
           </div>
         </div>
       </div>
@@ -1267,8 +1304,8 @@
      * 6. ORDER OBJECT CONSTRUCTION (EXACT FIELD ORDER)
      **************************************************************/
     function buildOrderObjectFromSpec(spec) {
-      // Exact key insertion order as requested:
-      // id, productId, addedAt, status, [salePrice if editPrice], commissionRate, warrantyDays
+      // Exact key insertion order:
+      // id, productId, addedAt, status, [salePrice if editPrice], discountCode, commissionRate, warrantyDays
       const obj = {
         id: String(spec.id).trim(),
         productId: spec.productId,
@@ -1281,6 +1318,9 @@
         obj.salePrice = isNaN(numericSalePrice) ? 0 : numericSalePrice;
       }
 
+      // Always include a real Boolean. Missing values default to true.
+      obj.discountCode = spec.discountCode !== false;
+
       const comm = Number(spec.commissionRate);
       const warr = Number(spec.warrantyDays);
 
@@ -1290,7 +1330,7 @@
       return obj;
     }
 
-    function readCurrentFormSpec(overrideId = null) {
+    function readCurrentFormSpec(overrideId = null, discountCodeOverride = true) {
       const idVal = overrideId !== null
         ? overrideId
         : (document.getElementById('orderIdInput').value.trim() || '295332280');
@@ -1308,6 +1348,7 @@
         productId,
         addedAt,
         status: currentStatus,
+        discountCode: discountCodeOverride !== false,
         editPrice,
         salePrice,
         commissionRate,
@@ -1346,7 +1387,8 @@
           return;
         }
 
-        const spec = readCurrentFormSpec(rawId);
+        const singleDiscountCode = document.getElementById('singleDiscountCodeSelect').value === 'true';
+        const spec = readCurrentFormSpec(rawId, singleDiscountCode);
         orderQueue.push(spec);
         orderQueue = sortOrdersNewestFirst(orderQueue);
 
@@ -1373,6 +1415,7 @@
           return;
         }
 
+        const bulkDiscountCode = document.getElementById('bulkDiscountCodeSelect').value === 'true';
         let addedCount = 0;
         let invalidIds = [];
         let duplicateIds = [];
@@ -1386,7 +1429,7 @@
             duplicateIds.push(token);
             return;
           }
-          orderQueue.push(readCurrentFormSpec(token));
+          orderQueue.push(readCurrentFormSpec(token, bulkDiscountCode));
           addedCount++;
         });
 
@@ -1473,6 +1516,11 @@
                     ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                     : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                 }">${item.status}</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded ${
+                  item.discountCode !== false
+                    ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
+                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                }">discountCode: ${item.discountCode !== false}</span>
                 ${
                   item.editPrice
                     ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">salePrice: ${item.salePrice}</span>`
@@ -1596,12 +1644,14 @@
         // Deduplicate within preview batch for the selected product
         const uniqueIds = [...new Set(ids)];
         if (uniqueIds.length > 0) {
-          const specs = uniqueIds.map(idStr => readCurrentFormSpec(idStr));
+          const bulkDiscountCode = document.getElementById('bulkDiscountCodeSelect').value === 'true';
+          const specs = uniqueIds.map(idStr => readCurrentFormSpec(idStr, bulkDiscountCode));
           return sortOrdersNewestFirst(specs).map(buildOrderObjectFromSpec);
         }
       }
 
-      return [buildOrderObjectFromSpec(readCurrentFormSpec())];
+      const singleDiscountCode = document.getElementById('singleDiscountCodeSelect').value === 'true';
+      return [buildOrderObjectFromSpec(readCurrentFormSpec(null, singleDiscountCode))];
     }
 
     function formatOrderObjectsToString(objects) {
@@ -1770,6 +1820,8 @@
       setOrderStatus('approved');
       document.getElementById('editPriceToggle').checked = false;
       document.getElementById('salePriceInput').value = '0';
+      document.getElementById('singleDiscountCodeSelect').value = 'true';
+      document.getElementById('bulkDiscountCodeSelect').value = 'true';
       onEditPriceToggle();
       document.getElementById('commissionInput').value = '30';
       document.getElementById('warrantyInput').value = '14';

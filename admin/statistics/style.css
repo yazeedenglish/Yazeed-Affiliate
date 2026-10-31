@@ -1109,3 +1109,52 @@ button:disabled {
 .logout-button:hover {
   color: #C94C4C;
 }
+
+/* No Warranty Preview Button */
+#noWarrantyToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  margin: 0 auto 20px;
+}
+
+/* Hover */
+#noWarrantyToggle:hover {
+  border-color: var(--indigo);
+  color: var(--indigo);
+  transform: translateY(-1px);
+}
+
+/* Active Preview Mode */
+#noWarrantyToggle.active {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(0, 104, 155, 0.18);
+}
+
+/* Keyboard Accessibility */
+#noWarrantyToggle:focus-visible {
+  outline: 3px solid rgba(0, 104, 155, 0.25);
+  outline-offset: 3px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #noWarrantyToggle {
+    width: 100%;
+    padding: 12px;
+  }
+}

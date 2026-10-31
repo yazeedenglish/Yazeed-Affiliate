@@ -2,7 +2,14 @@
   "use strict";
 
   const $ = (selector) => document.querySelector(selector);
-  const state = { affiliates: [], products: {}, periodType: "month", periodValue: "", demo: false };
+  const state = {
+  affiliates: [],
+  products: {},
+  periodType: "month",
+  periodValue: "",
+  demo: false,
+  noWarrantyPreview: false
+};
   const money = (value) => new Intl.NumberFormat("en-SA", { style: "currency", currency: "SAR", maximumFractionDigits: 2 }).format(Number(value) || 0);
   const number = (value) => new Intl.NumberFormat("en-SA", { maximumFractionDigits: 0 }).format(Number(value) || 0);
   const safe = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -10,7 +17,10 @@
   const dateLabel = (value) => { const d = dateOf(value); return d ? new Intl.DateTimeFormat("en-SA", { year: "numeric", month: "short", day: "numeric" }).format(d) : "—"; };
   const keyForDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   const approved = (order) => String(order.status || "approved").toLowerCase() === "approved";
-  const refunded = (order) => ["refunded", "cancelled", "canceled"].includes(String(order.status || "").toLowerCase());
+  const refunded = (order) =>
+  ["rejected", "refunded", "cancelled", "canceled"].includes(
+    String(order.status || "").trim().toLowerCase()
+  );
 
   function productFor(order) { return state.products[order.productId] || { name: order.productId || "منتج غير معروف", price: 0 }; }
   function salePrice(order) {
@@ -18,7 +28,30 @@
     if (order.salePrice !== undefined && order.salePrice !== null && order.salePrice !== "" && Number.isFinite(Number(order.salePrice))) return Number(order.salePrice);
     return Number(productFor(order).price) || 0;
   }
-  function commission(order) { return salePrice(order) * ((Number(order.commissionRate) || 0) / 100); }
+  // Original product price before customer discount.
+function basePrice(order) {
+  return salePrice(order);
+}
+
+// Actual amount paid by the customer.
+function actualSale(order) {
+  const price = basePrice(order);
+
+  return order.discountCode === false
+    ? price
+    : price * 0.90;
+}
+
+// Affiliate commission is ALWAYS calculated from the original price.
+function commission(order) {
+  return basePrice(order) * ((Number(order.commissionRate) || 0) / 100);
+}
+
+// Store profit = actual customer payment - affiliate commission.
+function storeProfit(order) {
+  return actualSale(order) - commission(order);
+}
+
   function warrantyEnded(order, now = new Date()) {
     const added = dateOf(order.addedAt);
     if (!added) return false;
@@ -26,13 +59,42 @@
     return now.getTime() >= added.getTime() + days * 86400000;
   }
   function allOrders() {
-    const rows = [];
-    state.affiliates.forEach((partner) => (Array.isArray(partner.orders) ? partner.orders : []).forEach((order, index) => {
-      const date = dateOf(order.addedAt);
-      rows.push({ ...order, date, partnerCode: partner.code || "", partnerName: partner.name || partner.code || "شريك", partnerActive: partner.active !== false, _index: index, sale: salePrice(order), commission: commission(order), product: productFor(order) });
-    }));
-    return rows;
-  }
+  const rows = [];
+
+  state.affiliates.forEach((partner) => {
+    (Array.isArray(partner.orders) ? partner.orders : []).forEach((order, index) => {
+
+      // Default discountCode to true if missing or invalid.
+      const normalizedOrder = {
+        ...order,
+        discountCode: order.discountCode === false ? false : true
+      };
+
+      const date = dateOf(normalizedOrder.addedAt);
+
+      rows.push({
+        ...normalizedOrder,
+        date,
+        partnerCode: partner.code || "",
+        partnerName: partner.name || partner.code || "شريك",
+        partnerActive: partner.active !== false,
+        _index: index,
+
+        // Financial calculations.
+        sale: actualSale(normalizedOrder),
+        basePrice: basePrice(normalizedOrder),
+        commission: commission(normalizedOrder),
+        storeProfit: storeProfit(normalizedOrder),
+
+        product: productFor(normalizedOrder)
+      });
+
+    });
+  });
+
+  return rows;
+}
+
   function periodOrders() {
     return allOrders().filter((order) => {
       if (!order.date) return false;
@@ -74,24 +136,45 @@
   function render() {
     const all = allOrders();
     const orders = periodOrders();
-    const valid = orders.filter((o) => approved(o) && !refunded(o));
+    // Only approved orders with expired warranties count financially.
+// Financial preview: include active warranties only when requested.
+const valid = orders.filter((o) => {
+  const status = String(o.status || "").trim().toLowerCase();
+
+  return (
+    status === "approved" &&
+    (state.noWarrantyPreview || warrantyEnded(o))
+  );
+});
     const active = state.affiliates.filter((p) => p.active !== false).length;
     $("#activePartners").textContent = number(active);
     $("#partnerCountHint").textContent = `من إجمالي ${number(state.affiliates.length)} شريك`;
     $("#totalOrders").textContent = number(valid.length);
-    $("#totalSales").textContent = money(valid.reduce((sum, o) => sum + o.sale, 0));
-    const totalSales = valid.reduce((sum, o) => sum + o.sale, 0);
-const totalCommissions = valid.reduce((sum, o) => sum + o.commission, 0);
-const discountCost = totalSales * 0.10;
+   // Actual sales after customer discounts.
+const totalSales = valid.reduce(
+  (sum, o) => sum + o.sale,
+  0
+);
 
-const storeProfit = totalSales - totalCommissions - discountCost;
+// Affiliate commissions based on original product prices.
+const totalCommissions = valid.reduce(
+  (sum, o) => sum + o.commission,
+  0
+);
 
-$("#storeProfit").textContent = money(storeProfit);
-    $("#earnedCommission").textContent = money(valid.filter((o) => warrantyEnded(o)).reduce((sum, o) => sum + o.commission, 0));
+// Store profit after customer discounts and affiliate commissions.
+const totalStoreProfit = valid.reduce(
+  (sum, o) => sum + o.storeProfit,
+  0
+);
+
+$("#totalSales").textContent = money(totalSales);
+$("#storeProfit").textContent = money(totalStoreProfit);
+    $("#earnedCommission").textContent = money(totalCommissions);
 
     const rankings = state.affiliates.map((partner) => {
       const partnerOrders = valid.filter((o) => o.partnerCode === partner.code);
-      return { partner, count: partnerOrders.length, sales: partnerOrders.reduce((s, o) => s + o.sale, 0), commission: partnerOrders.filter((o) => warrantyEnded(o)).reduce((s, o) => s + o.commission, 0) };
+      return { partner, count: partnerOrders.length, sales: partnerOrders.reduce((s, o) => s + o.sale, 0), commission: partnerOrders.reduce((s, o) => s + o.commission, 0) };
     }).sort((a, b) => b.sales - a.sales || b.count - a.count || b.commission - a.commission);
     $("#rankingCount").textContent = `${number(rankings.length)} شركاء`;
     $("#rankingBody").innerHTML = rankings.length ? rankings.map((r, i) => `<tr><td><span class="rank-number">${number(i + 1)}</span></td><td class="partner-cell"><strong>${safe(r.partner.name || r.partner.code)}</strong><small>${safe(r.partner.code || "")}${r.partner.active === false ? " · غير نشط" : ""}</small></td><td>${number(r.count)}</td><td class="money">${money(r.sales)}</td><td class="money">${money(r.commission)}</td></tr>`).join("") : '<tr><td colspan="5" class="empty-cell">حمّل ملفات JSON لعرض الترتيب.</td></tr>';
@@ -186,6 +269,16 @@ const loaded = await Promise.all(
     $("#importStatus").style.color = isError ? "#C94C4C" : "";
   }
   $("#refreshData").addEventListener("click", loadProjectData);
+  // Toggle financial preview without warranty.
+$("#noWarrantyToggle").addEventListener("click", () => {
+  state.noWarrantyPreview = !state.noWarrantyPreview;
+
+  const button = $("#noWarrantyToggle");
+
+  button.classList.toggle("active", state.noWarrantyPreview);
+
+  render();
+});
   $("#periodType").addEventListener("change", () => { refreshPeriodOptions(); render(); });
   $("#periodValue").addEventListener("change", (event) => { state.periodValue = event.target.value; render(); });
   $("#themeToggle").addEventListener("click", () => {

@@ -11,6 +11,7 @@
     "addedAt": "2026-08-16T03:34:59+03:00",
      "status": "approved",
     "commissionRate": 30,
+    "discountCode": true,
     "warrantyDays": 14
   },
 
