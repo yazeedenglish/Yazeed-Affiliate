@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order JSON Studio — Fast Order Code Generator</title>
+  <title>Yazeed English — Order JSON Builder</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Cairo (for Arabic product names) & JetBrains Mono -->
+  <!-- Google Fonts: Tajawal & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
@@ -19,19 +19,9 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'Cairo', 'sans-serif'],
+            sans: ['Tajawal', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
-            arabic: ['Cairo', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
+            arabic: ['Tajawal', 'sans-serif'],
           }
         }
       }
@@ -39,84 +29,307 @@
   </script>
 
   <style>
-    /* Custom Scrollbars & Subtle Animations */
+    :root {
+      --bg-main: #F5F6F2;
+      --bg-subtle: #ECEEE7;
+      --bg-input: #F9FAF7;
+      --card-bg: #FFFFFF;
+      --text-primary: #00273a;
+      --text-secondary: #5B645F;
+      --primary-blue: #00689b;
+      --primary-blue-hover: #005580;
+      --primary-blue-soft: rgba(0, 104, 155, 0.1);
+      --border-color: #DCDFD6;
+      --danger: #C94C4C;
+      --danger-soft: rgba(201, 76, 76, 0.12);
+      --success: #15803d;
+      --success-soft: rgba(21, 128, 61, 0.12);
+      --warning: #A16207;
+      --warning-soft: rgba(161, 98, 7, 0.12);
+      --shadow-card: 0 2px 10px rgba(0, 39, 58, 0.04);
+      --code-bg: #F7F8F4;
+      --json-key: #00689b;
+      --json-string: #15803d;
+      --json-number: #C94C4C;
+      --json-boolean: #A16207;
+    }
+
+    html.dark {
+      --bg-main: #15181C;
+      --bg-subtle: #181C20;
+      --bg-input: #15181C;
+      --card-bg: #1E2227;
+      --text-primary: #E8EAE4;
+      --text-secondary: #9AA39B;
+      --primary-blue: #0088C7;
+      --primary-blue-hover: #009be3;
+      --primary-blue-soft: rgba(0, 136, 199, 0.15);
+      --border-color: #33383B;
+      --danger: #E2897A;
+      --danger-soft: rgba(226, 137, 122, 0.15);
+      --success: #4ade80;
+      --success-soft: rgba(74, 222, 128, 0.14);
+      --warning: #FACC15;
+      --warning-soft: rgba(250, 204, 21, 0.14);
+      --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.28);
+      --code-bg: #15181C;
+      --json-key: #58b9f7;
+      --json-string: #4ade80;
+      --json-number: #E2897A;
+      --json-boolean: #FACC15;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Tajawal', sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: hidden;
+    }
+
+    /* Core Cards & Containers */
+    .ye-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 19px;
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .ye-subpanel {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+    }
+
+    /* Inputs & Selects */
+    .ye-input {
+      min-height: 48px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .ye-input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.65;
+    }
+
+    .ye-input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px var(--primary-blue-soft);
+    }
+
+    /* Buttons */
+    .ye-btn-primary {
+      min-height: 48px;
+      background-color: var(--primary-blue);
+      color: #FFFFFF;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .ye-btn-primary:hover {
+      background-color: var(--primary-blue-hover);
+    }
+
+    .ye-btn-secondary {
+      min-height: 48px;
+      background-color: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-weight: 700;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .ye-btn-secondary:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--primary-blue);
+    }
+
+    .ye-btn-danger {
+      background-color: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      border-radius: 10px;
+      font-weight: 700;
+      transition: opacity 0.15s ease;
+    }
+
+    .ye-btn-danger:hover {
+      opacity: 0.88;
+    }
+
+    /* Badges & Status Indicators */
+    .ye-badge-neutral {
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .ye-badge-blue {
+      background-color: var(--primary-blue-soft);
+      color: var(--primary-blue);
+      border: 1px solid var(--primary-blue);
+    }
+
+    .ye-badge-success {
+      background-color: var(--success-soft);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .ye-badge-warning {
+      background-color: var(--warning-soft);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .ye-badge-danger {
+      background-color: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    /* JSON Syntax Highlighting */
+    .json-key { color: var(--json-key); font-weight: 600; }
+    .json-string { color: var(--json-string); }
+    .json-number { color: var(--json-number); }
+    .json-boolean { color: var(--json-boolean); font-weight: 700; }
+
+    /* Custom Scrollbars */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+      background: var(--bg-subtle);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(71, 85, 105, 0.8);
+      background: var(--border-color);
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(99, 102, 241, 0.8);
-    }
-
-    .json-key { color: #93c5fd; }
-    .json-string { color: #86efac; }
-    .json-number { color: #fca5a5; }
-    .json-boolean { color: #fcd34d; }
-
-    @keyframes pulseSubtle {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.015); }
-    }
-    .animate-pop {
-      animation: pulseSubtle 0.25s ease-out;
+      background: var(--primary-blue);
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen flex flex-col">
 
   <!-- Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+  <!-- Bulk Order Individual Discount Code Modal -->
+  <div id="bulkDiscountModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="ye-card max-w-md w-full p-6 space-y-5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center ye-badge-blue text-lg shrink-0">
+            <i class="fa-solid fa-percent"></i>
+          </div>
+          <div>
+            <span id="bulkModalStepBadge" class="text-[11px] font-mono font-semibold uppercase px-2 py-0.5 rounded ye-badge-neutral">9-Digit Order Detected</span>
+            <h3 class="text-xl font-bold mt-1" style="color: var(--text-primary);">Does this order have a discount code?</h3>
+          </div>
+        </div>
+        <button type="button" onclick="cancelBulkDiscountModal()" class="p-2 rounded-lg hover:opacity-75 transition" style="color: var(--text-secondary);" title="Cancel">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="ye-subpanel p-4 flex items-center justify-between gap-3">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Order Number (<code class="font-mono">id</code>)</div>
+          <div id="bulkModalOrderIdDisplay" class="text-2xl font-mono font-bold tracking-wider mt-0.5" style="color: var(--primary-blue);">290555118</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Product</div>
+          <div id="bulkModalProductDisplay" class="text-sm font-mono font-semibold mt-0.5" style="color: var(--text-primary);">english</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-1">
+        <button
+          type="button"
+          id="bulkModalTrueBtn"
+          onclick="confirmBulkDiscountSelection(true)"
+          class="ye-btn-primary py-3.5 px-4 flex flex-col items-center justify-center gap-1 text-base shadow-sm"
+        >
+          <div class="flex items-center gap-2 font-mono font-bold text-lg">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>True</span>
+          </div>
+          <span class="text-xs opacity-90 font-normal">"discountCode": true</span>
+        </button>
+
+        <button
+          type="button"
+          id="bulkModalFalseBtn"
+          onclick="confirmBulkDiscountSelection(false)"
+          class="ye-btn-secondary py-3.5 px-4 flex flex-col items-center justify-center gap-1 text-base"
+        >
+          <div class="flex items-center gap-2 font-mono font-bold text-lg">
+            <i class="fa-solid fa-circle-xmark" style="color: var(--danger);"></i>
+            <span>False</span>
+          </div>
+          <span class="text-xs font-normal" style="color: var(--text-secondary);">"discountCode": false</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-center" style="color: var(--text-secondary);">
+        Keyboard shortcuts: press <kbd class="px-1.5 py-0.5 rounded font-mono text-[11px] ye-badge-neutral">1</kbd> or <kbd class="px-1.5 py-0.5 rounded font-mono text-[11px] ye-badge-neutral">T</kbd> for <strong>True</strong>, <kbd class="px-1.5 py-0.5 rounded font-mono text-[11px] ye-badge-neutral">2</kbd> or <kbd class="px-1.5 py-0.5 rounded font-mono text-[11px] ye-badge-neutral">F</kbd> for <strong>False</strong>.
+      </p>
+    </div>
+  </div>
 
   <!-- Product Catalog Modal -->
-  <div id="catalogModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
+  <div id="catalogModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="ye-card max-w-lg w-full p-6">
+      <div class="flex items-center justify-between pb-4 border-b" style="border-color: var(--border-color);">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl ye-badge-blue flex items-center justify-center">
             <i class="fa-solid fa-boxes-stacked"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Products Catalog</h3>
-            <p class="text-xs text-slate-400">Manage product keys, Arabic names, and default prices</p>
+            <h3 class="text-lg font-bold" style="color: var(--text-primary);">Products Catalog</h3>
+            <p class="text-xs" style="color: var(--text-secondary);">Manage product keys, Arabic names, and default prices</p>
           </div>
         </div>
-        <button onclick="toggleCatalogModal(false)" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+        <button onclick="toggleCatalogModal(false)" class="p-2 rounded-lg transition hover:opacity-75" style="color: var(--text-secondary);">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <!-- Existing Products List -->
-      <div id="catalogList" class="my-4 max-h-60 overflow-y-auto space-y-2 pr-1"></div>
+      <div id="catalogList" class="my-4 max-h-60 overflow-y-auto space-y-2.5 pr-1"></div>
 
       <!-- Add New Product Form -->
-      <form id="addProductForm" onsubmit="handleAddProduct(event)" class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Add / Update Product</div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <form id="addProductForm" onsubmit="handleAddProduct(event)" class="ye-subpanel p-4 space-y-3.5">
+        <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Add / Update Product</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Key (productId)</label>
-            <input type="text" id="newProdKey" required placeholder="e.g. grammar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono" />
+            <label class="block text-xs font-bold mb-1" style="color: var(--text-secondary);">Key (productId)</label>
+            <input type="text" id="newProdKey" required placeholder="e.g. grammar" class="ye-input w-full px-3 py-2 text-sm font-mono" />
           </div>
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Name (Arabic/Title)</label>
-            <input type="text" id="newProdName" required placeholder="دورة القواعد" dir="rtl" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-arabic" />
+            <label class="block text-xs font-bold mb-1" style="color: var(--text-secondary);">Name (Arabic)</label>
+            <input type="text" id="newProdName" required placeholder="دورة القواعد" dir="rtl" class="ye-input w-full px-3 py-2 text-sm font-arabic" />
           </div>
           <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Price</label>
-            <input type="number" id="newProdPrice" required placeholder="49" min="0" step="any" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono" />
+            <label class="block text-xs font-bold mb-1" style="color: var(--text-secondary);">Price (SAR)</label>
+            <input type="number" id="newProdPrice" required placeholder="49" min="0" step="any" class="ye-input w-full px-3 py-2 text-sm font-mono" />
           </div>
         </div>
-        <div class="flex justify-between items-center pt-1">
-          <button type="button" onclick="resetDefaultCatalog()" class="text-xs text-slate-400 hover:text-amber-400 transition">
+        <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
+          <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-bold transition hover:underline" style="color: var(--warning);">
             <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Default 4 Products
           </button>
-          <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+          <button type="submit" class="ye-btn-primary text-xs px-4 py-2.5 flex items-center gap-1.5" style="min-height: 40px;">
             <i class="fa-solid fa-plus"></i> Save Product
           </button>
         </div>
@@ -125,189 +338,237 @@
   </div>
 
   <!-- Header -->
-  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
-          <i class="fa-solid fa-code text-white text-lg"></i>
+  <header class="sticky top-0 z-30 border-b transition-colors" style="background-color: var(--card-bg); border-color: var(--border-color);">
+    <div class="max-w-[1160px] mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-extrabold text-lg tracking-tight text-white shadow-sm shrink-0" style="background-color: var(--primary-blue);">
+          YE
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold tracking-tight text-white">Order JSON Builder</h1>
-            <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded-full bg-brand-500/15 text-brand-400 border border-brand-500/30 font-semibold">Fast Mode</span>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight leading-none" style="color: var(--text-primary);">Yazeed English</h1>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ye-badge-blue">JSON Builder</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Instant JSON generator for orders with custom pricing &amp; bulk support</p>
+          <p class="text-xs sm:text-sm font-bold mt-1" style="color: var(--text-secondary);">Order Code Administration</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <button onclick="toggleCatalogModal(true)" class="bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs font-medium flex items-center gap-2 transition shadow-sm">
-          <i class="fa-solid fa-tags text-brand-400"></i>
+      <!-- Header Actions -->
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <button
+          type="button"
+          onclick="toggleCatalogModal(true)"
+          class="ye-btn-secondary px-3.5 py-2 text-xs sm:text-sm flex items-center gap-2"
+          style="min-height: 42px;"
+        >
+          <i class="fa-solid fa-tags" style="color: var(--primary-blue);"></i>
           <span>Products (<span id="productCountBadge">4</span>)</span>
         </button>
-        <button onclick="loadSampleOrder()" class="bg-slate-800/90 hover:bg-slate-800 text-slate-300 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-medium hidden md:flex items-center gap-1.5 transition" title="Fill example order #295332280">
-          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+
+        <button
+          type="button"
+          onclick="loadSampleOrder()"
+          class="ye-btn-secondary px-3.5 py-2 text-xs sm:text-sm hidden md:flex items-center gap-1.5"
+          style="min-height: 42px;"
+          title="Fill example order #295332280"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--warning);"></i>
           <span>Sample</span>
+        </button>
+
+        <button
+          type="button"
+          id="themeToggleBtn"
+          onclick="toggleTheme()"
+          class="ye-btn-secondary w-11 h-11 flex items-center justify-center rounded-xl"
+          style="min-height: 42px;"
+          title="Toggle Light / Dark Mode"
+          aria-label="Toggle Theme"
+        >
+          <i id="themeToggleIcon" class="fa-solid fa-moon text-base"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Grid -->
-  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+  <!-- Main Content Grid (Max 1160px) -->
+  <main class="max-w-[1160px] w-full mx-auto px-4 sm:px-6 py-7 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
     <!-- Left Column: Order Builder & Queue (7 cols) -->
     <div class="lg:col-span-7 space-y-6">
 
-      <!-- Mode Switcher Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <!-- Tabs -->
-        <div class="flex border-b border-slate-800 bg-slate-950/50 p-1.5 gap-1.5">
-          <button id="tabSingleBtn" onclick="switchEntryMode('single')" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow">
+      <!-- Mode Switcher & Builder Card -->
+      <div class="ye-card overflow-hidden">
+        <!-- Entry Mode Tabs -->
+        <div class="grid grid-cols-2 gap-2 p-2 border-b" style="background-color: var(--bg-subtle); border-color: var(--border-color);">
+          <button
+            type="button"
+            id="tabSingleBtn"
+            onclick="switchEntryMode('single')"
+            class="py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition"
+          >
             <i class="fa-solid fa-bolt"></i>
             <span>Single Order Entry</span>
           </button>
-          <button id="tabBulkBtn" onclick="switchEntryMode('bulk')" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60">
+          <button
+            type="button"
+            id="tabBulkBtn"
+            onclick="switchEntryMode('bulk')"
+            class="py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition"
+          >
             <i class="fa-solid fa-layer-group"></i>
-            <span>Bulk IDs Paste</span>
+            <span>Bulk IDs Entry</span>
           </button>
         </div>
 
-        <div class="p-5 sm:p-6 space-y-5">
-          <!-- SINGLE ENTRY MODE -->
-          <div id="singleEntryPanel">
-            <div class="flex items-center justify-between mb-2">
-              <label for="orderIdInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                Order Number (<code class="text-brand-400 font-mono">id</code>) <span class="text-rose-400">*</span>
-              </label>
-              <div class="flex items-center gap-2">
-                <span id="singleDigitBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">0 / 9 digits</span>
-                <span class="text-[11px] text-slate-400 hidden sm:inline">Press <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px] font-mono">Enter</kbd></span>
-              </div>
-            </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                <i class="fa-solid fa-hashtag"></i>
-              </div>
-              <input
-                type="text"
-                id="orderIdInput"
-                inputmode="numeric"
-                maxlength="9"
-                placeholder="9 digits e.g. 295332280"
-                autocomplete="off"
-                oninput="onSingleOrderIdInput(this)"
-                onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addOrderFromForm(); }"
-                class="w-full bg-slate-950 border border-slate-700/90 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-xl pl-10 pr-24 py-3 text-base font-mono text-white placeholder-slate-600 transition outline-none tracking-wider"
-              />
-              <button
-                type="button"
-                onclick="pasteClipboardToId()"
-                class="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1"
-                title="Paste from clipboard"
-              >
-                <i class="fa-regular fa-paste"></i> Paste
-              </button>
-            </div>
-            <p id="singleOrderValidationMsg" class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
-              <i class="fa-solid fa-shield-halved text-brand-400"></i>
-              <span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>
-            </p>
+        <div class="p-5 sm:p-6 space-y-6">
 
-            <!-- Discount Code Setting for This Single Order -->
-            <div class="mt-3 bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <label for="singleDiscountCodeSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                  Discount Code (<code class="text-brand-400 font-mono">discountCode</code>)
+          <!-- SINGLE ENTRY MODE -->
+          <div id="singleEntryPanel" class="space-y-4">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="orderIdInput" class="block text-sm font-bold" style="color: var(--text-primary);">
+                  Order Number (<code class="font-mono" style="color: var(--primary-blue);">id</code>) <span style="color: var(--danger);">*</span>
                 </label>
-                <p class="text-[11px] text-slate-500 mt-1">Choose whether this single order has a discount code.</p>
+                <div class="flex items-center gap-2">
+                  <span id="singleDigitBadge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral">0 / 9 digits</span>
+                  <span class="text-xs hidden sm:inline" style="color: var(--text-secondary);">Press <kbd class="px-1.5 py-0.5 rounded text-[11px] font-mono ye-badge-neutral">Enter</kbd></span>
+                </div>
               </div>
-              <select
-                id="singleDiscountCodeSelect"
-                onchange="handleLivePreview()"
-                class="bg-slate-900 border border-slate-700 focus:border-brand-500 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none"
-              >
-                <option value="true" selected>true — Has discount code</option>
-                <option value="false">false — No discount code</option>
-              </select>
+
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" style="color: var(--text-secondary);">
+                  <i class="fa-solid fa-hashtag"></i>
+                </div>
+                <input
+                  type="text"
+                  id="orderIdInput"
+                  inputmode="numeric"
+                  maxlength="9"
+                  placeholder="9 digits e.g. 295332280"
+                  autocomplete="off"
+                  oninput="onSingleOrderIdInput(this)"
+                  onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addOrderFromForm(); }"
+                  class="ye-input w-full pl-10 pr-24 py-3 text-base font-mono font-semibold tracking-wider"
+                />
+                <button
+                  type="button"
+                  onclick="pasteClipboardToId()"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 ye-btn-secondary px-3 py-1.5 text-xs flex items-center gap-1.5"
+                  style="min-height: 34px; border-radius: 9px;"
+                  title="Paste from clipboard"
+                >
+                  <i class="fa-regular fa-paste"></i> Paste
+                </button>
+              </div>
+
+              <p id="singleOrderValidationMsg" class="text-xs mt-2 flex items-center gap-1.5" style="color: var(--text-secondary);">
+                <i class="fa-solid fa-shield-halved" style="color: var(--primary-blue);"></i>
+                <span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>
+              </p>
             </div>
+
+            <!-- Hidden legacy select preserved for DOM compatibility -->
+            <select id="singleDiscountCodeSelect" class="hidden">
+              <option value="true" selected>true</option>
+            </select>
           </div>
 
-          <!-- BULK ENTRY MODE (Hidden by default) -->
-          <div id="bulkEntryPanel" class="hidden space-y-2">
-            <div class="flex items-center justify-between">
-              <label for="bulkIdsInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                Multiple 9-Digit Order IDs <span class="text-rose-400">*</span>
-              </label>
-              <span id="bulkStatsBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">0 valid • 0 invalid</span>
-            </div>
-            <textarea
-              id="bulkIdsInput"
-              rows="4"
-              placeholder="295332280&#10;295332281&#10;295332282"
-              oninput="onBulkInputUpdate()"
-              class="w-full bg-slate-950 border border-slate-700/90 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-xl p-3.5 text-sm font-mono text-white placeholder-slate-600 transition outline-none"
-            ></textarea>
-
-            <!-- Discount Code Setting for All Orders in This Bulk Batch -->
-            <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <label for="bulkDiscountCodeSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                  Discount Code (<code class="text-brand-400 font-mono">discountCode</code>)
+          <!-- BULK ENTRY MODE (Individual Discount Code per 9-Digit Order) -->
+          <div id="bulkEntryPanel" class="hidden space-y-4">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <label for="bulkIdsInput" class="block text-sm font-bold" style="color: var(--text-primary);">
+                  Enter 9-Digit Order ID (<span style="color: var(--primary-blue);">Auto Popup on 9th Digit</span>) <span style="color: var(--danger);">*</span>
                 </label>
-                <p class="text-[11px] text-slate-500 mt-1">This value will be applied to every order generated from the bulk IDs above.</p>
+                <div class="flex items-center gap-2">
+                  <span id="bulkDigitLiveBadge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral">0 / 9 digits</span>
+                  <span id="bulkStatsBadge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-blue">0 staged</span>
+                </div>
               </div>
-              <select
-                id="bulkDiscountCodeSelect"
-                onchange="handleLivePreview()"
-                class="bg-slate-900 border border-slate-700 focus:border-brand-500 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none"
-              >
-                <option value="true" selected>true — Has discount code</option>
-                <option value="false">false — No discount code</option>
-              </select>
+
+              <div class="relative">
+                <textarea
+                  id="bulkIdsInput"
+                  rows="2"
+                  placeholder="Type or paste a 9-digit Order ID (e.g. 290555118)..."
+                  oninput="onBulkInputUpdate()"
+                  class="ye-input w-full p-3.5 text-base font-mono font-semibold tracking-wider resize-y"
+                ></textarea>
+              </div>
+
+              <p class="text-xs mt-2 flex items-center gap-1.5" style="color: var(--text-secondary);">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-blue);"></i>
+                <span>As soon as the 9th digit is entered, a popup asks whether <strong>that specific order</strong> has a discount code (<code class="font-mono">True</code> or <code class="font-mono">False</code>).</span>
+              </p>
             </div>
 
-            <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
-              <i class="fa-solid fa-filter text-brand-400"></i>
-              <span>Only valid 9-digit numbers are accepted. Any duplicate Order ID + Product combinations are skipped.</span>
-            </p>
+            <!-- Hidden legacy select preserved for DOM compatibility -->
+            <select id="bulkDiscountCodeSelect" class="hidden" onchange="handleLivePreview()">
+              <option value="true" selected>true</option>
+              <option value="false">false</option>
+            </select>
+
+            <!-- Staged Individual Bulk Orders List -->
+            <div class="ye-subpanel p-4 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-list-check" style="color: var(--primary-blue);"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-primary);">Staged Bulk Orders (Individual Discount Codes)</span>
+                </div>
+                <button
+                  type="button"
+                  id="clearBulkStagedBtn"
+                  onclick="clearBulkStagedOrders()"
+                  class="hidden text-xs font-bold hover:underline"
+                  style="color: var(--danger);"
+                >
+                  Clear Staged
+                </button>
+              </div>
+
+              <div id="bulkStagedListContainer" class="max-h-56 overflow-y-auto space-y-2">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
           </div>
 
           <!-- PRODUCT SELECTION (Quick Cards + Dropdown) -->
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-              <label for="productSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                Select Product (<code class="text-brand-400 font-mono">productId</code>)
+          <div class="space-y-3 pt-1">
+            <div class="flex items-center justify-between gap-2">
+              <label for="productSelect" class="block text-sm font-bold" style="color: var(--text-primary);">
+                Select Product (<code class="font-mono" style="color: var(--primary-blue);">productId</code>)
               </label>
-              <span id="selectedProductPriceHint" class="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+              <span id="selectedProductPriceHint" class="text-xs font-mono font-semibold px-2.5 py-1 rounded-md ye-badge-success">
                 Default Price: 49 SAR
               </span>
             </div>
 
             <!-- Quick Product Pills -->
-            <div id="productQuickCards" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+            <div id="productQuickCards" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
 
             <!-- Standard Dropdown for accessibility & large catalogs -->
             <select
               id="productSelect"
               onchange="onProductSelectChange(this.value)"
-              class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 outline-none transition"
+              class="ye-input w-full px-3.5 py-2.5 text-sm font-semibold"
             ></select>
           </div>
 
           <!-- STATUS & EDIT PRICE ROW -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Status Toggle -->
-            <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 flex flex-col justify-between">
-              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2.5">
-                Order Status (<code class="text-brand-400 font-mono">status</code>)
+            <div class="ye-subpanel p-4 flex flex-col justify-between">
+              <label class="block text-xs font-bold uppercase tracking-wider mb-2.5" style="color: var(--text-secondary);">
+                Order Status (<code class="font-mono" style="color: var(--primary-blue);">status</code>)
               </label>
-              <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+              <div class="grid grid-cols-2 gap-2 p-1 rounded-xl border" style="background-color: var(--card-bg); border-color: var(--border-color);">
                 <button
                   type="button"
                   id="statusApprovedBtn"
                   onclick="setOrderStatus('approved')"
-                  class="py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-emerald-600 text-white shadow"
+                  class="py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition"
                 >
                   <i class="fa-solid fa-circle-check"></i>
                   <span>approved</span>
@@ -316,7 +577,7 @@
                   type="button"
                   id="statusRejectedBtn"
                   onclick="setOrderStatus('rejected')"
-                  class="py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white"
+                  class="py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition"
                 >
                   <i class="fa-solid fa-circle-xmark"></i>
                   <span>rejected</span>
@@ -324,24 +585,24 @@
               </div>
             </div>
 
-            <!-- Edit Price Option (Adds "salePrice": 0 underneath status) -->
-            <div id="editPriceCard" class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3.5 transition-all">
+            <!-- Edit Price Option (Adds "salePrice" underneath status) -->
+            <div id="editPriceCard" class="ye-subpanel p-4 flex flex-col justify-between transition-all">
               <div class="flex items-center justify-between mb-2.5">
                 <label for="editPriceToggle" class="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     id="editPriceToggle"
                     onchange="onEditPriceToggle()"
-                    class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer"
+                    class="w-4 h-4 rounded cursor-pointer accent-[#00689b]"
                   />
-                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-200">Edit Price</span>
+                  <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-primary);">Edit Price</span>
                 </label>
-                <span class="text-[11px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                <span class="text-[11px] font-mono font-semibold px-2 py-0.5 rounded ye-badge-warning">
                   +"salePrice"
                 </span>
               </div>
 
-              <!-- Sale Price Input Box (Enabled when Edit Price is checked) -->
+              <!-- Sale Price Input Box -->
               <div id="salePriceWrapper" class="opacity-40 pointer-events-none transition-opacity flex items-center gap-2">
                 <div class="relative flex-1">
                   <input
@@ -350,14 +611,16 @@
                     value="0"
                     step="any"
                     oninput="handleLivePreview()"
-                    class="w-full bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-lg pl-3 pr-14 py-1.5 text-sm font-mono text-white outline-none"
+                    class="ye-input w-full pl-3 pr-16 py-1.5 text-sm font-mono font-semibold"
+                    style="min-height: 40px;"
                   />
-                  <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400">salePrice</span>
+                  <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono" style="color: var(--text-secondary);">salePrice</span>
                 </div>
                 <button
                   type="button"
                   onclick="setSalePriceValue(0)"
-                  class="px-2 py-1.5 text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition"
+                  class="ye-btn-secondary px-2.5 py-1.5 text-xs font-mono"
+                  style="min-height: 40px;"
                   title="Set salePrice to 0"
                 >
                   0
@@ -365,7 +628,8 @@
                 <button
                   type="button"
                   onclick="setSalePriceToProductDefault()"
-                  class="px-2 py-1.5 text-xs font-mono bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg border border-slate-700 transition"
+                  class="ye-btn-secondary px-2.5 py-1.5 text-xs font-mono"
+                  style="min-height: 40px; color: var(--success);"
                   title="Use selected product's default price"
                 >
                   Prod
@@ -375,10 +639,10 @@
           </div>
 
           <!-- COMMISSION, WARRANTY & TIMESTAMP ROW -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
             <!-- Commission Rate -->
             <div class="sm:col-span-3">
-              <label for="commissionInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label for="commissionInput" class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary);">
                 Commission Rate
               </label>
               <div class="relative">
@@ -388,15 +652,15 @@
                   value="30"
                   step="any"
                   oninput="handleLivePreview()"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none"
+                  class="ye-input w-full px-3.5 py-2 text-sm font-mono font-semibold"
                 />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-mono">%</span>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono" style="color: var(--text-secondary);">%</span>
               </div>
             </div>
 
             <!-- Warranty Days -->
             <div class="sm:col-span-3">
-              <label for="warrantyInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label for="warrantyInput" class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary);">
                 Warranty Days
               </label>
               <div class="relative">
@@ -406,47 +670,47 @@
                   value="14"
                   step="1"
                   oninput="handleLivePreview()"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none"
+                  class="ye-input w-full px-3.5 py-2 text-sm font-mono font-semibold"
                 />
-                <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-500">days</span>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style="color: var(--text-secondary);">days</span>
               </div>
             </div>
 
             <!-- AddedAt Timestamp -->
             <div class="sm:col-span-6">
               <div class="flex items-center justify-between mb-1.5">
-                <label for="addedAtInput" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Added At (<code class="text-brand-400 font-mono">+03:00</code>)
+                <label for="addedAtInput" class="block text-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">
+                  Added At (<code class="font-mono" style="color: var(--primary-blue);">+03:00</code>)
                 </label>
-                <label class="flex items-center gap-1.5 text-[11px] text-slate-400 cursor-pointer select-none">
-                  <input type="checkbox" id="autoNowToggle" onchange="onAutoNowChange()" class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-brand-600" />
-                  <span>Auto current time on generate</span>
+                <label class="flex items-center gap-1.5 text-xs cursor-pointer select-none" style="color: var(--text-secondary);">
+                  <input type="checkbox" id="autoNowToggle" onchange="onAutoNowChange()" class="w-3.5 h-3.5 rounded accent-[#00689b]" />
+                  <span>Auto time on generate</span>
                 </label>
               </div>
-              <div class="flex gap-1.5">
+              <div class="flex gap-2">
                 <input
                   type="text"
                   id="addedAtInput"
                   oninput="handleLivePreview()"
-                  class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 outline-none"
+                  class="ye-input w-full px-3 py-2 text-xs font-mono font-semibold"
                 />
                 <button
                   type="button"
                   onclick="toggleDatePickerPanel()"
                   id="datePickerToggleBtn"
-                  class="bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 px-3 rounded-xl border border-brand-500/40 text-xs font-semibold transition flex items-center gap-1.5 shrink-0"
+                  class="ye-btn-secondary px-3 text-xs flex items-center gap-1.5 shrink-0"
                   title="Choose Year, Month, or Day easily"
                 >
-                  <i class="fa-regular fa-calendar-days text-brand-400"></i>
-                  <span>Pick Date</span>
+                  <i class="fa-regular fa-calendar-days" style="color: var(--primary-blue);"></i>
+                  <span>Date</span>
                 </button>
                 <button
                   type="button"
                   onclick="refreshTimestampNow(true)"
-                  class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 rounded-xl border border-slate-700 text-xs font-medium transition flex items-center gap-1 shrink-0"
+                  class="ye-btn-secondary px-3 text-xs flex items-center gap-1 shrink-0"
                   title="Update to current time (+03:00)"
                 >
-                  <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+                  <i class="fa-solid fa-clock-rotate-left" style="color: var(--success);"></i>
                   <span>Now</span>
                 </button>
               </div>
@@ -454,18 +718,18 @@
           </div>
 
           <!-- EASY YEAR / MONTH / DAY PICKER PANEL -->
-          <div id="easyDatePickerPanel" class="hidden bg-slate-950/90 border border-brand-500/40 rounded-2xl p-4 space-y-3.5 shadow-inner">
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+          <div id="easyDatePickerPanel" class="hidden ye-subpanel p-4 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b" style="border-color: var(--border-color);">
               <div class="flex items-center gap-2">
-                <i class="fa-solid fa-calendar-check text-brand-400"></i>
-                <span class="text-xs font-bold uppercase tracking-wider text-white">Easy Year / Month / Day Selector</span>
+                <i class="fa-solid fa-calendar-check" style="color: var(--primary-blue);"></i>
+                <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-primary);">Easy Year / Month / Day Selector</span>
               </div>
               <div class="flex flex-wrap items-center gap-1.5">
-                <button type="button" onclick="applyQuickDatePreset(0)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 px-2.5 py-1 rounded-lg transition font-medium">Today</button>
-                <button type="button" onclick="applyQuickDatePreset(-1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-lg transition font-medium">Yesterday</button>
-                <button type="button" onclick="shiftCurrentDateDays(-1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2 py-1 rounded-lg transition font-mono" title="Subtract 1 Day">-1d</button>
-                <button type="button" onclick="shiftCurrentDateDays(1)" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2 py-1 rounded-lg transition font-mono" title="Add 1 Day">+1d</button>
-                <button type="button" onclick="toggleDatePickerPanel(false)" class="text-slate-400 hover:text-white px-1.5 py-1 text-xs">
+                <button type="button" onclick="applyQuickDatePreset(0)" class="text-xs px-2.5 py-1 rounded-lg font-bold ye-badge-success">Today</button>
+                <button type="button" onclick="applyQuickDatePreset(-1)" class="text-xs px-2.5 py-1 rounded-lg font-bold ye-badge-neutral">Yesterday</button>
+                <button type="button" onclick="shiftCurrentDateDays(-1)" class="text-xs px-2 py-1 rounded-lg font-mono ye-badge-neutral" title="Subtract 1 Day">-1d</button>
+                <button type="button" onclick="shiftCurrentDateDays(1)" class="text-xs px-2 py-1 rounded-lg font-mono ye-badge-neutral" title="Add 1 Day">+1d</button>
+                <button type="button" onclick="toggleDatePickerPanel(false)" class="px-2 py-1 text-xs" style="color: var(--text-secondary);">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -474,20 +738,20 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <!-- Year Selector -->
               <div>
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Year</label>
+                <label class="block text-[11px] font-bold uppercase mb-1" style="color: var(--text-secondary);">Year</label>
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="stepPickerField('year', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
-                  <select id="pickerYearSelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500"></select>
-                  <button type="button" onclick="stepPickerField('year', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                  <button type="button" onclick="stepPickerField('year', -1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">-</button>
+                  <select id="pickerYearSelect" onchange="applyEasyDatePickerChange()" class="ye-input w-full px-2 py-1 text-xs font-mono" style="min-height: 38px;"></select>
+                  <button type="button" onclick="stepPickerField('year', 1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">+</button>
                 </div>
               </div>
 
               <!-- Month Selector -->
               <div>
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Month</label>
+                <label class="block text-[11px] font-bold uppercase mb-1" style="color: var(--text-secondary);">Month</label>
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="stepPickerField('month', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
-                  <select id="pickerMonthSelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500">
+                  <button type="button" onclick="stepPickerField('month', -1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">-</button>
+                  <select id="pickerMonthSelect" onchange="applyEasyDatePickerChange()" class="ye-input w-full px-2 py-1 text-xs font-mono" style="min-height: 38px;">
                     <option value="01">01 - Jan</option>
                     <option value="02">02 - Feb</option>
                     <option value="03">03 - Mar</option>
@@ -501,93 +765,94 @@
                     <option value="11">11 - Nov</option>
                     <option value="12">12 - Dec</option>
                   </select>
-                  <button type="button" onclick="stepPickerField('month', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                  <button type="button" onclick="stepPickerField('month', 1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">+</button>
                 </div>
               </div>
 
               <!-- Day Selector -->
               <div>
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Day</label>
+                <label class="block text-[11px] font-bold uppercase mb-1" style="color: var(--text-secondary);">Day</label>
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="stepPickerField('day', -1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">-</button>
-                  <select id="pickerDaySelect" onchange="applyEasyDatePickerChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-mono text-white outline-none focus:border-brand-500"></select>
-                  <button type="button" onclick="stepPickerField('day', 1)" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 px-2 py-1.5 rounded-lg text-xs">+</button>
+                  <button type="button" onclick="stepPickerField('day', -1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">-</button>
+                  <select id="pickerDaySelect" onchange="applyEasyDatePickerChange()" class="ye-input w-full px-2 py-1 text-xs font-mono" style="min-height: 38px;"></select>
+                  <button type="button" onclick="stepPickerField('day', 1)" class="ye-btn-secondary px-2.5 py-1 text-xs" style="min-height: 38px;">+</button>
                 </div>
               </div>
 
               <!-- Time (HH:mm:ss) -->
               <div>
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Time (HH:MM:SS)</label>
-                <div class="flex items-center gap-1">
-                  <input
-                    type="time"
-                    id="pickerTimeInput"
-                    step="1"
-                    value="03:34:59"
-                    onchange="applyEasyDatePickerChange()"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-mono text-white outline-none focus:border-brand-500"
-                  />
-                </div>
+                <label class="block text-[11px] font-bold uppercase mb-1" style="color: var(--text-secondary);">Time</label>
+                <input
+                  type="time"
+                  id="pickerTimeInput"
+                  step="1"
+                  value="03:34:59"
+                  onchange="applyEasyDatePickerChange()"
+                  class="ye-input w-full px-2.5 py-1 text-xs font-mono"
+                  style="min-height: 38px;"
+                />
               </div>
             </div>
 
-            <!-- Quick Day Number Grid (1..31) for 1-click day change -->
+            <!-- Quick Day Number Grid -->
             <div>
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Click Day of Month</div>
-              <div id="quickDayGrid" class="grid grid-cols-11 sm:grid-cols-16 gap-1"></div>
+              <div class="text-[11px] font-bold uppercase mb-1.5" style="color: var(--text-secondary);">Quick Select Day of Month</div>
+              <div id="quickDayGrid" class="grid grid-cols-8 sm:grid-cols-11 gap-1.5"></div>
             </div>
           </div>
 
           <!-- ACTION BUTTONS -->
-          <div class="pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
+          <div class="pt-4 border-t flex flex-wrap items-center gap-3" style="border-color: var(--border-color);">
             <button
               type="button"
               onclick="addOrderFromForm()"
-              class="flex-1 min-w-[200px] bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold py-3 px-5 rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 text-sm"
+              class="ye-btn-primary flex-1 min-w-[210px] py-3 px-5 flex items-center justify-center gap-2 text-sm sm:text-base shadow-sm"
             >
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <i class="fa-solid fa-plus-circle"></i>
               <span id="primaryActionBtnText">Generate &amp; Add to List</span>
             </button>
 
             <button
               type="button"
               onclick="generateInstantOnly()"
-              class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl border border-slate-700 transition flex items-center gap-2 text-xs sm:text-sm"
+              class="ye-btn-secondary py-3 px-4 flex items-center gap-2 text-xs sm:text-sm"
               title="Generate directly from current form fields and copy immediately"
             >
-              <i class="fa-regular fa-copy text-brand-400"></i>
+              <i class="fa-regular fa-copy" style="color: var(--primary-blue);"></i>
               <span>Quick Copy Current</span>
             </button>
 
             <button
               type="button"
               onclick="resetFormDefaults()"
-              class="bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 py-3 px-3.5 rounded-xl border border-slate-800 transition text-xs"
+              class="ye-btn-secondary py-3 px-3.5 text-xs sm:text-sm"
               title="Reset form to defaults"
             >
               <i class="fa-solid fa-rotate-left"></i>
             </button>
           </div>
+
         </div>
       </div>
 
       <!-- QUEUED / SELECTED ORDERS LIST -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+      <div class="ye-card overflow-hidden">
+        <div class="px-5 py-4 border-b flex flex-wrap items-center justify-between gap-2" style="border-color: var(--border-color);">
           <div class="flex items-center gap-2.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <h2 class="text-sm font-bold text-white uppercase tracking-wider">Added Orders Queue</h2>
-            <span id="queueCountBadge" class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">0</span>
-            <span class="text-[11px] font-mono text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2 py-0.5 rounded hidden sm:inline-flex items-center gap-1">
-              <i class="fa-solid fa-arrow-down-wide-short"></i> Newest Date First
+            <span class="w-2.5 h-2.5 rounded-full" style="background-color: var(--success);"></span>
+            <h2 class="text-sm sm:text-base font-extrabold uppercase tracking-wide" style="color: var(--text-primary);">Added Orders Queue</h2>
+            <span id="queueCountBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full ye-badge-blue">0</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded ye-badge-neutral hidden sm:inline-flex items-center gap-1">
+              <i class="fa-solid fa-arrow-down-wide-short" style="color: var(--primary-blue);"></i> Newest First
             </span>
           </div>
+
           <div class="flex items-center gap-2">
             <button
               type="button"
               onclick="toggleAllQueueSalePrice()"
               id="bulkTogglePriceBtn"
-              class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 px-2.5 py-1 rounded-lg transition"
+              class="hidden text-xs font-bold px-3 py-1.5 rounded-lg ye-badge-warning transition"
             >
               <i class="fa-solid fa-dollar-sign mr-1"></i>Toggle All Edit Price
             </button>
@@ -595,40 +860,41 @@
               type="button"
               onclick="clearOrderQueue()"
               id="clearQueueBtn"
-              class="hidden text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 px-2.5 py-1 rounded-lg transition"
+              class="hidden text-xs px-3 py-1.5 ye-btn-danger"
             >
               <i class="fa-regular fa-trash-can mr-1"></i>Clear All
             </button>
           </div>
         </div>
 
-        <div id="orderQueueContainer" class="p-4 max-h-80 overflow-y-auto space-y-2.5">
+        <div id="orderQueueContainer" class="p-4 max-h-96 overflow-y-auto space-y-2.5">
           <!-- Populated dynamically via JS -->
         </div>
       </div>
+
     </div>
 
     <!-- Right Column: JSON Code Output & Download (5 cols) -->
-    <div class="lg:col-span-5 lg:sticky lg:top-22 space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+      <div class="ye-card overflow-hidden flex flex-col">
         <!-- Output Top Bar -->
-        <div class="p-4 border-b border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-3">
+        <div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="background-color: var(--bg-subtle); border-color: var(--border-color);">
           <div>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-file-code text-brand-400"></i>
+            <h2 class="text-base font-extrabold flex items-center gap-2" style="color: var(--text-primary);">
+              <i class="fa-solid fa-file-code" style="color: var(--primary-blue);"></i>
               <span>Generated JSON Code</span>
             </h2>
-            <p id="outputModeSubtext" class="text-[11px] text-slate-400 mt-0.5">Live preview of your order structure</p>
+            <p id="outputModeSubtext" class="text-xs mt-0.5" style="color: var(--text-secondary);">Live preview of your order structure</p>
           </div>
 
           <!-- Format Selector -->
-          <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px] font-medium">
+          <div class="flex items-center p-1 rounded-xl border text-xs font-bold" style="background-color: var(--card-bg); border-color: var(--border-color);">
             <button
               type="button"
               id="fmtSnippetBtn"
               onclick="setOutputFormat('snippet')"
-              class="px-2.5 py-1 rounded-lg transition bg-brand-600 text-white"
-              title="Object with trailing comma { ... }, just like your example"
+              class="px-2.5 py-1.5 rounded-lg transition"
+              title="Object with trailing comma { ... },"
             >
               { }, Snippet
             </button>
@@ -636,7 +902,7 @@
               type="button"
               id="fmtArrayBtn"
               onclick="setOutputFormat('array')"
-              class="px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white"
+              class="px-2.5 py-1.5 rounded-lg transition"
               title="Valid JSON Array [ { ... } ]"
             >
               [ ] Array
@@ -645,7 +911,7 @@
               type="button"
               id="fmtObjectBtn"
               onclick="setOutputFormat('object')"
-              class="px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white"
+              class="px-2.5 py-1.5 rounded-lg transition"
               title="Clean JSON Object without trailing comma"
             >
               { } Clean
@@ -654,12 +920,13 @@
         </div>
 
         <!-- Primary Copy & Download Bar -->
-        <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800/80 flex flex-wrap items-center gap-2">
+        <div class="p-4 border-b flex flex-wrap items-center gap-2.5" style="border-color: var(--border-color);">
           <button
             type="button"
             onclick="copyGeneratedJson()"
             id="copyJsonBtn"
-            class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+            class="ye-btn-primary flex-1 py-2.5 px-4 flex items-center justify-center gap-2 text-sm"
+            style="min-height: 44px;"
           >
             <i class="fa-regular fa-copy"></i>
             <span>Copy JSON Code</span>
@@ -668,22 +935,24 @@
           <button
             type="button"
             onclick="downloadGeneratedJson()"
-            class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold py-2.5 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+            class="ye-btn-secondary py-2.5 px-4 flex items-center justify-center gap-2 text-sm"
+            style="min-height: 44px;"
           >
-            <i class="fa-solid fa-download text-brand-400"></i>
+            <i class="fa-solid fa-download" style="color: var(--primary-blue);"></i>
             <span>Download .json</span>
           </button>
         </div>
 
         <!-- Syntax Highlighted Code Preview + Editable Raw Textarea Toggle -->
-        <div class="relative bg-slate-950">
-          <div class="flex items-center justify-between px-4 py-2 border-b border-slate-900 text-[11px] font-mono text-slate-400">
+        <div class="relative" style="background-color: var(--code-bg);">
+          <div class="flex items-center justify-between px-4 py-2.5 border-b text-xs font-mono" style="border-color: var(--border-color); color: var(--text-secondary);">
             <span id="jsonLineStats">1 order • Ready</span>
             <button
               type="button"
               onclick="toggleRawTextView()"
               id="rawViewToggleBtn"
-              class="text-slate-400 hover:text-brand-400 transition flex items-center gap-1"
+              class="font-bold hover:underline flex items-center gap-1.5"
+              style="color: var(--primary-blue);"
             >
               <i class="fa-solid fa-pen-to-square"></i>
               <span>Raw Text Mode</span>
@@ -693,30 +962,30 @@
           <!-- Highlighted Pre Block -->
           <pre
             id="jsonHighlightedPre"
-            class="p-4 sm:p-5 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto max-h-[460px] text-slate-200 select-all"
+            class="p-4 sm:p-5 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto max-h-[460px] select-all"
+            style="color: var(--text-primary);"
           ></pre>
 
           <!-- Editable Raw Textarea (hidden unless toggled) -->
           <textarea
             id="jsonRawTextarea"
             rows="16"
-            class="hidden w-full p-4 sm:p-5 bg-slate-950 text-emerald-300 font-mono text-xs sm:text-sm leading-relaxed focus:outline-none resize-y"
+            class="hidden w-full p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed focus:outline-none resize-y"
+            style="background-color: var(--code-bg); color: var(--text-primary);"
           ></textarea>
         </div>
 
-        <!-- Reference Footer showing current active Product Catalog JSON -->
-        <div class="p-3.5 bg-slate-950/90 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-circle-info text-brand-400"></i>
-            <span>Every order includes <code class="text-sky-300 font-mono">"discountCode"</code> (default <strong>true</strong>). When <strong>Edit Price</strong> is active, <code class="text-amber-300 font-mono">"salePrice"</code> stays directly below <code class="text-emerald-300 font-mono">"status"</code>.</span>
-          </div>
+        <!-- Reference Footer -->
+        <div class="p-4 border-t text-xs flex items-start gap-2.5" style="background-color: var(--card-bg); border-color: var(--border-color); color: var(--text-secondary);">
+          <i class="fa-solid fa-circle-info mt-0.5" style="color: var(--primary-blue);"></i>
+          <span>Every order includes its individual <code class="font-mono font-bold" style="color: var(--primary-blue);">"discountCode"</code> Boolean. When <strong>Edit Price</strong> is active, <code class="font-mono font-bold" style="color: var(--warning);">"salePrice"</code> stays directly below <code class="font-mono font-bold" style="color: var(--success);">"status"</code>.</span>
         </div>
       </div>
     </div>
 
   </main>
 
-    <script>
+  <script>
     /**************************************************************
      * 1. DEFAULT PRODUCTS CATALOG & STATE
      **************************************************************/
@@ -741,22 +1010,85 @@
 
     let productsCatalog = {};
     let orderQueue = [];
+    let bulkStagedOrders = [];       // Holds individual { id, discountCode } items in Bulk mode
+    let pendingPromptIds = [];
+    let activePromptId = null;
+    let activePromptMode = null;   // Currently displayed 9-digit ID in the modal
     let currentEntryMode = 'single'; // 'single' | 'bulk'
     let currentStatus = 'approved';  // 'approved' | 'rejected'
     let outputFormat = 'snippet';    // 'snippet' | 'array' | 'object'
     let isRawView = false;
 
     /**************************************************************
-     * 2. INITIALIZATION & STORAGE
+     * 2. INITIALIZATION, THEME & STORAGE
      **************************************************************/
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       loadCatalogFromStorage();
       initEasyDatePickerOptions();
       refreshTimestampNow(false);
       renderProductSelectors('english');
+      switchEntryMode('single');
+      setOrderStatus('approved');
+      setOutputFormat('snippet');
+      renderBulkStagedOrders();
       renderOrderQueue();
       handleLivePreview();
+
+      // Keyboard shortcuts when Bulk Discount Modal is open
+      window.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('bulkDiscountModal');
+        if (!modal || modal.classList.contains('hidden')) return;
+
+        if (e.key === '1' || e.key === 't' || e.key === 'T' || e.key === 'Enter') {
+          e.preventDefault();
+          confirmBulkDiscountSelection(true);
+        } else if (e.key === '2' || e.key === 'f' || e.key === 'F') {
+          e.preventDefault();
+          confirmBulkDiscountSelection(false);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelBulkDiscountModal();
+        }
+      });
     });
+
+    function initTheme() {
+  let savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem('yazeed_theme') || localStorage.getItem('theme');
+  } catch (_) {}
+
+  // If no saved preference exists, default to 'dark'
+  const activeTheme = savedTheme ? savedTheme : 'dark';
+
+  const htmlEl = document.documentElement;
+  if (activeTheme === 'dark') {
+    htmlEl.classList.add('dark');
+    htmlEl.classList.remove('light');
+  } else {
+    htmlEl.classList.remove('dark');
+    htmlEl.classList.add('light');
+  }
+  updateThemeToggleIcon();
+}
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const isDark = htmlEl.classList.toggle('dark');
+      htmlEl.classList.toggle('light', !isDark);
+      try {
+        localStorage.setItem('yazeed_theme', isDark ? 'dark' : 'light');
+      } catch (_) {}
+      updateThemeToggleIcon();
+    }
+
+    function updateThemeToggleIcon() {
+      const icon = document.getElementById('themeToggleIcon');
+      if (!icon) return;
+      const isDark = document.documentElement.classList.contains('dark');
+      icon.className = isDark ? 'fa-solid fa-sun text-base text-amber-400' : 'fa-solid fa-moon text-base';
+    }
 
     function loadCatalogFromStorage() {
       try {
@@ -786,7 +1118,6 @@
      * 3. TIMESTAMP FORMATTING (+03:00 OFFSET)
      **************************************************************/
     function getFormattedTimestampPlus3(dateObj = new Date()) {
-      // Shift time to UTC+3 explicitly so it always formats as YYYY-MM-DDTHH:mm:ss+03:00
       const utcMs = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
       const plus3Date = new Date(utcMs + (3 * 3600000));
 
@@ -862,10 +1193,8 @@
         dayBtn.type = 'button';
         dayBtn.textContent = d;
         const isActive = d === safeDay;
-        dayBtn.className = `py-1 rounded text-[11px] font-mono border transition ${
-          isActive
-            ? 'bg-brand-600 border-brand-400 text-white font-bold shadow'
-            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+        dayBtn.className = `py-1.5 rounded-lg text-xs font-mono font-bold border transition ${
+          isActive ? 'ye-badge-blue' : 'ye-badge-neutral hover:opacity-80'
         }`;
         dayBtn.onclick = () => {
           daySelect.value = dStr;
@@ -876,7 +1205,6 @@
     }
 
     function parseTimestampParts(isoStr) {
-      // Expected format: YYYY-MM-DDTHH:mm:ss+03:00
       const match = String(isoStr).trim().match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}(?::\d{2})?)/);
       if (match) {
         let timePart = match[4];
@@ -900,7 +1228,6 @@
 
       if (!yearSelect || !monthSelect || !timeInput) return;
 
-      // Ensure year option exists
       if (![...yearSelect.options].some(o => o.value === parts.year)) {
         const opt = document.createElement('option');
         opt.value = parts.year;
@@ -915,7 +1242,6 @@
     }
 
     function applyEasyDatePickerChange() {
-      // Uncheck auto-now when user manually picks a date
       document.getElementById('autoNowToggle').checked = false;
 
       const year = document.getElementById('pickerYearSelect').value;
@@ -989,7 +1315,7 @@
     }
 
     /**************************************************************
-     * 3C. 9-DIGIT VALIDATION & DUPLICATE CHECK HELPERS
+     * 3C. 9-DIGIT VALIDATION, SINGLE INPUT & BULK INDIVIDUAL POPUP
      **************************************************************/
     function isValidNineDigitOrderId(idStr) {
       return /^\d{9}$/.test(String(idStr).trim());
@@ -1001,69 +1327,354 @@
       return list.some(item => String(item.id).trim() === cleanId && String(item.productId).trim() === cleanProd);
     }
 
+    function isDuplicateInBulkStaged(orderId, productId) {
+  const cleanId = String(orderId).trim();
+  const cleanProd = String(productId).trim();
+  return bulkStagedOrders.some(item => String(item.id).trim() === cleanId && String(item.productId).trim() === cleanProd);
+}
+
     function sortOrdersNewestFirst(list) {
       return [...list].sort((a, b) => {
         const timeA = Date.parse(a.addedAt);
         const timeB = Date.parse(b.addedAt);
         if (!isNaN(timeA) && !isNaN(timeB) && timeB !== timeA) {
-          return timeB - timeA; // Newest date on top
+          return timeB - timeA;
         }
         return String(b.addedAt).localeCompare(String(a.addedAt));
       });
     }
 
     function onSingleOrderIdInput(inputEl) {
-      // Strip non-digits automatically so the user can only type numbers up to 9 digits
-      const digitsOnly = inputEl.value.replace(/\D/g, '').slice(0, 9);
-      if (inputEl.value !== digitsOnly) {
-        inputEl.value = digitsOnly;
+  const digitsOnly = inputEl.value.replace(/\D/g, '').slice(0, 9);
+  if (inputEl.value !== digitsOnly) {
+    inputEl.value = digitsOnly;
+  }
+
+  const len = digitsOnly.length;
+  const badge = document.getElementById('singleDigitBadge');
+  const msg = document.getElementById('singleOrderValidationMsg');
+  const currentProduct = document.getElementById('productSelect').value || 'english';
+
+  badge.textContent = `${len} / 9 digits`;
+
+  if (len === 0) {
+    badge.className = 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral';
+    msg.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-blue);"></i><span>Auto-popup appears on the 9th digit to choose Discount Code.</span>`;
+    msg.style.color = 'var(--text-secondary)';
+  } else if (len < 9) {
+    badge.className = 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-warning';
+    msg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>Order number needs ${9 - len} more digit${9 - len === 1 ? '' : 's'}...</span>`;
+    msg.style.color = 'var(--warning)';
+  } else {
+    // 9 Digits reached
+    if (isDuplicateOrderAndProduct(digitsOnly, currentProduct)) {
+      badge.className = 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-danger';
+      msg.innerHTML = `<i class="fa-solid fa-ban"></i><span>Duplicate! Order #${digitsOnly} with product "${currentProduct}" already exists.</span>`;
+      msg.style.color = 'var(--danger)';
+    } else {
+      // Clear input and immediately trigger Single Mode popup
+      inputEl.value = '';
+      badge.textContent = '0 / 9 digits';
+      badge.className = 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral';
+      msg.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-blue);"></i><span>Auto-popup appears on the 9th digit to choose Discount Code.</span>`;
+      msg.style.color = 'var(--text-secondary)';
+      
+      enqueueDiscountPrompt([digitsOnly], 'single');
+    }
+  }
+  handleLivePreview();
+}
+
+    /**
+     * BULK INPUT HANDLER:
+     * Detects when 9 digits are entered (or multiple 9-digit IDs are pasted)
+     * and immediately opens the individual Discount Code popup for each valid 9-digit order.
+     */
+    function onBulkInputUpdate() {
+  const bulkEl = document.getElementById('bulkIdsInput');
+  const liveBadge = document.getElementById('bulkDigitLiveBadge');
+  if (!bulkEl) return;
+
+  const rawText = bulkEl.value;
+  const currentProduct = document.getElementById('productSelect').value || 'english';
+  const tokens = rawText.split(/[\n,\s]+/).map(t => t.trim()).filter(Boolean);
+
+  if (tokens.length <= 1 && !/[\n,\s]/.test(rawText)) {
+    const cleanDigits = rawText.replace(/\D/g, '').slice(0, 9);
+    if (bulkEl.value !== cleanDigits) {
+      bulkEl.value = cleanDigits;
+    }
+    if (liveBadge) {
+      liveBadge.textContent = `${cleanDigits.length} / 9 digits`;
+      liveBadge.className = cleanDigits.length === 9
+        ? 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-success'
+        : (cleanDigits.length > 0 ? 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-warning' : 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral');
+    }
+
+    if (cleanDigits.length === 9) {
+      if (isDuplicateInBulkStaged(cleanDigits, currentProduct) || isDuplicateOrderAndProduct(cleanDigits, currentProduct)) {
+        showToast(`Duplicate blocked: Order #${cleanDigits} with product "${currentProduct}" already exists!`, 'warning');
+        bulkEl.value = '';
+        if (liveBadge) liveBadge.textContent = '0 / 9 digits';
+        return;
       }
+      bulkEl.value = '';
+      if (liveBadge) liveBadge.textContent = '0 / 9 digits';
+      enqueueDiscountPrompt([cleanDigits], 'bulk'); // Use updated prompt
+      return;
+    }
 
-      const len = digitsOnly.length;
-      const badge = document.getElementById('singleDigitBadge');
-      const msg = document.getElementById('singleOrderValidationMsg');
-      const currentProduct = document.getElementById('productSelect').value || 'english';
+    updateBulkStatsBadge();
+    handleLivePreview();
+    return;
+  }
 
-      badge.textContent = `${len} / 9 digits`;
+  const validIdsToPrompt = [];
+  const remainingTokens = [];
+  let skippedDuplicates = 0;
 
-      if (len === 0) {
-        badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
-        msg.innerHTML = `<i class="fa-solid fa-shield-halved text-brand-400"></i><span>Must be exactly 9 numeric digits. Duplicate (Order ID + Product) is automatically blocked.</span>`;
-        msg.className = 'text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5';
-      } else if (len < 9) {
-        badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30';
-        msg.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400"></i><span>Order number needs ${9 - len} more digit${9 - len === 1 ? '' : 's'} (must be 9 digits).</span>`;
-        msg.className = 'text-[11px] text-amber-300 mt-1.5 flex items-center gap-1.5';
+  tokens.forEach((tok) => {
+    const digits = tok.replace(/\D/g, '');
+    if (digits.length === 9) {
+      if (
+        isDuplicateInBulkStaged(digits, currentProduct) ||
+        isDuplicateOrderAndProduct(digits, currentProduct) ||
+        validIdsToPrompt.includes(digits) ||
+        pendingPromptIds.includes(digits)
+      ) {
+        skippedDuplicates++;
       } else {
-        // Exactly 9 digits: check if duplicate with current product
-        if (isDuplicateOrderAndProduct(digitsOnly, currentProduct)) {
-          badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40';
-          msg.innerHTML = `<i class="fa-solid fa-ban text-rose-400"></i><span>Duplicate! Order #${digitsOnly} with product "${currentProduct}" is already in the queue.</span>`;
-          msg.className = 'text-[11px] text-rose-400 mt-1.5 flex items-center gap-1.5 font-medium';
-        } else {
-          badge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-          msg.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>Valid 9-digit Order ID — Ready to generate.</span>`;
-          msg.className = 'text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1.5';
+        validIdsToPrompt.push(digits);
+      }
+    } else if (digits.length > 0) {
+      remainingTokens.push(digits.slice(0, 9));
+    }
+  });
+
+  bulkEl.value = remainingTokens.join('\n');
+  if (liveBadge) liveBadge.textContent = `${remainingTokens.length === 1 ? remainingTokens[0].length : 0} / 9 digits`;
+
+  if (skippedDuplicates > 0) {
+    showToast(`Skipped ${skippedDuplicates} duplicate 9-digit ID(s) for "${currentProduct}"`, 'warning');
+  }
+
+  if (validIdsToPrompt.length > 0) {
+    enqueueDiscountPrompt(validIdsToPrompt, 'bulk'); // Use updated prompt
+  }
+
+  updateBulkStatsBadge();
+  handleLivePreview();
+}
+
+    function enqueueBulkDiscountPrompt(idsArray) {
+      idsArray.forEach((idStr) => {
+        if (!pendingBulkPromptIds.includes(idStr) && activeBulkPromptId !== idStr) {
+          pendingBulkPromptIds.push(idStr);
         }
+      });
+      if (!activeBulkPromptId) {
+        showNextBulkDiscountModal();
+      }
+    }
+
+    function showNextBulkDiscountModal() {
+      const modal = document.getElementById('bulkDiscountModal');
+      if (pendingBulkPromptIds.length === 0) {
+        activeBulkPromptId = null;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        const bulkEl = document.getElementById('bulkIdsInput');
+        if (bulkEl && currentEntryMode === 'bulk') {
+          bulkEl.focus();
+        }
+        return;
       }
 
+      activeBulkPromptId = pendingBulkPromptIds.shift();
+      const currentProduct = document.getElementById('productSelect').value || 'english';
+      const remaining = pendingBulkPromptIds.length;
+
+      document.getElementById('bulkModalOrderIdDisplay').textContent = activeBulkPromptId;
+      document.getElementById('bulkModalProductDisplay').textContent = currentProduct;
+      document.getElementById('bulkModalStepBadge').textContent = remaining > 0
+        ? `9-Digit Order Detected (${remaining + 1} remaining)`
+        : '9-Digit Order Detected';
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function enqueueDiscountPrompt(idsArray, mode) {
+  idsArray.forEach((idStr) => {
+    if (!pendingPromptIds.includes(idStr) && activePromptId !== idStr) {
+      pendingPromptIds.push(idStr);
+    }
+  });
+  if (!activePromptId) {
+    activePromptMode = mode;
+    showNextDiscountModal();
+  }
+}
+
+function showNextDiscountModal() {
+  const modal = document.getElementById('bulkDiscountModal');
+  if (pendingPromptIds.length === 0) {
+    activePromptId = null;
+    activePromptMode = null;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    
+    // Return focus to the correct input box
+    const inputToFocus = currentEntryMode === 'single' ? 'orderIdInput' : 'bulkIdsInput';
+    const el = document.getElementById(inputToFocus);
+    if (el) el.focus();
+    return;
+  }
+
+  activePromptId = pendingPromptIds.shift();
+  const currentProduct = document.getElementById('productSelect').value || 'english';
+  const remaining = pendingPromptIds.length;
+
+  document.getElementById('bulkModalOrderIdDisplay').textContent = activePromptId;
+  document.getElementById('bulkModalProductDisplay').textContent = currentProduct;
+  document.getElementById('bulkModalStepBadge').textContent = remaining > 0
+    ? `9-Digit Order Detected (${remaining + 1} remaining)`
+    : '9-Digit Order Detected';
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+    function confirmBulkDiscountSelection(hasDiscountCode) {
+  if (!activePromptId) return;
+
+  const orderId = activePromptId;
+  const discountBool = Boolean(hasDiscountCode);
+  const currentProduct = document.getElementById('productSelect').value || 'english';
+
+  if (activePromptMode === 'single') {
+    // Single Mode: Commit directly to the main Queue
+    const spec = readCurrentFormSpec(orderId, discountBool, currentProduct);
+    orderQueue.push(spec);
+    orderQueue = sortOrdersNewestFirst(orderQueue);
+    renderOrderQueue();
+    showToast(`Added Order #${orderId} (${currentProduct}) with "discountCode": ${discountBool}`, 'success');
+  } else {
+    // Bulk Mode: Send to the staged list
+    if (!isDuplicateInBulkStaged(orderId, currentProduct)) {
+      bulkStagedOrders.push({
+        id: orderId,
+        productId: currentProduct,
+        discountCode: discountBool
+      });
+    }
+    renderBulkStagedOrders();
+    updateBulkStatsBadge();
+    showToast(`Saved #${orderId} (${currentProduct}) with "discountCode": ${discountBool}`, 'success');
+  }
+
+  activePromptId = null;
+  handleLivePreview();
+  showNextDiscountModal();
+}
+
+    function cancelBulkDiscountModal() {
+  activePromptId = null;
+  pendingPromptIds = [];
+  activePromptMode = null;
+  const modal = document.getElementById('bulkDiscountModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  
+  const inputToFocus = currentEntryMode === 'single' ? 'orderIdInput' : 'bulkIdsInput';
+  const el = document.getElementById(inputToFocus);
+  if (el) el.focus();
+}
+
+    function updateBulkStatsBadge() {
+      const badge = document.getElementById('bulkStatsBadge');
+      if (!badge) return;
+      const count = bulkStagedOrders.length;
+      badge.textContent = `${count} staged order${count === 1 ? '' : 's'}`;
+      badge.className = count > 0
+        ? 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-blue'
+        : 'text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md ye-badge-neutral';
+    }
+
+    function renderBulkStagedOrders() {
+  const container = document.getElementById('bulkStagedListContainer');
+  const clearBtn = document.getElementById('clearBulkStagedBtn');
+  if (!container) return;
+
+  updateBulkStatsBadge();
+
+  if (bulkStagedOrders.length === 0) {
+    if (clearBtn) clearBtn.classList.add('hidden');
+    container.innerHTML = `
+      <div class="text-center py-4 px-3 rounded-xl border border-dashed text-xs" style="border-color: var(--border-color); color: var(--text-secondary);">
+        Enter a 9-digit Order ID above. Each completed order will appear here with its own independent <code class="font-mono font-bold">discountCode</code> value.
+      </div>
+    `;
+    return;
+  }
+
+  if (clearBtn) clearBtn.classList.remove('hidden');
+  container.innerHTML = '';
+
+  bulkStagedOrders.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'flex items-center justify-between gap-2 px-3 py-2 rounded-xl border';
+    row.style.backgroundColor = 'var(--card-bg)';
+    row.style.borderColor = 'var(--border-color)';
+
+    row.innerHTML = `
+      <div class="flex items-center gap-2.5">
+        <span class="text-xs font-mono" style="color: var(--text-secondary);">#${idx + 1}</span>
+        <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">${escapeHtml(item.id)}</span>
+        <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded ye-badge-blue">${escapeHtml(item.productId)}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          onclick="toggleBulkStagedDiscount(${idx})"
+          class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg transition ${
+            item.discountCode ? 'ye-badge-success' : 'ye-badge-neutral'
+          }"
+        >
+          discountCode: ${item.discountCode}
+        </button>
+        <button
+          type="button"
+          onclick="removeBulkStagedOrder(${idx})"
+          class="p-1.5 rounded-lg hover:opacity-75 transition"
+          style="color: var(--danger);"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+    function toggleBulkStagedDiscount(index) {
+      if (!bulkStagedOrders[index]) return;
+      bulkStagedOrders[index].discountCode = !bulkStagedOrders[index].discountCode;
+      renderBulkStagedOrders();
       handleLivePreview();
     }
 
-    function onBulkInputUpdate() {
-      const rawBulk = document.getElementById('bulkIdsInput').value;
-      const tokens = rawBulk.split(/[\n,\s]+/).map(s => s.trim()).filter(Boolean);
-      const validTokens = tokens.filter(isValidNineDigitOrderId);
-      const invalidCount = tokens.length - validTokens.length;
-
-      const badge = document.getElementById('bulkStatsBadge');
-      if (badge) {
-        badge.textContent = `${validTokens.length} valid (9-digit) • ${invalidCount} invalid`;
-        badge.className = invalidCount > 0
-          ? 'text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30'
-          : 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-      }
+    function removeBulkStagedOrder(index) {
+      bulkStagedOrders.splice(index, 1);
+      renderBulkStagedOrders();
       handleLivePreview();
+    }
+
+    function clearBulkStagedOrders() {
+      bulkStagedOrders = [];
+      renderBulkStagedOrders();
+      handleLivePreview();
+      showToast('Cleared staged bulk orders', 'info');
     }
 
     /**************************************************************
@@ -1081,18 +1692,16 @@
         selectedKey = keys[0] || 'english';
       }
 
-      // Render Dropdown
       selectEl.innerHTML = '';
       keys.forEach((key) => {
         const prod = productsCatalog[key];
         const opt = document.createElement('option');
         opt.value = key;
-        opt.textContent = `${key} — ${prod.name} (${prod.price})`;
+        opt.textContent = `${key} — ${prod.name} (${prod.price} SAR)`;
         if (key === selectedKey) opt.selected = true;
         selectEl.appendChild(opt);
       });
 
-      // Render Quick Click Cards
       quickCardsEl.innerHTML = '';
       keys.forEach((key) => {
         const prod = productsCatalog[key];
@@ -1100,17 +1709,15 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.onclick = () => selectProductKey(key);
-        btn.className = `text-left p-2.5 rounded-xl border transition flex flex-col justify-between gap-1 ${
-          isSelected
-            ? 'bg-brand-600/20 border-brand-500 text-white shadow-sm shadow-brand-500/10'
-            : 'bg-slate-950/70 border-slate-800/90 text-slate-300 hover:border-slate-700 hover:bg-slate-900'
+        btn.className = `text-left p-3 rounded-xl border transition flex flex-col justify-between gap-1.5 ${
+          isSelected ? 'ye-badge-blue shadow-xs' : 'ye-subpanel hover:opacity-90'
         }`;
         btn.innerHTML = `
           <div class="flex items-center justify-between w-full gap-1">
-            <span class="font-mono text-xs font-bold ${isSelected ? 'text-brand-300' : 'text-slate-400'}">${escapeHtml(key)}</span>
-            <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-emerald-400 border border-slate-800">${prod.price}</span>
+            <span class="font-mono text-xs font-bold">${escapeHtml(key)}</span>
+            <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded ye-badge-success">${prod.price}</span>
           </div>
-          <div class="font-arabic text-xs font-semibold truncate w-full" dir="rtl">${escapeHtml(prod.name)}</div>
+          <div class="font-arabic text-sm font-bold truncate w-full" dir="rtl" style="color: var(--text-primary);">${escapeHtml(prod.name)}</div>
         `;
         quickCardsEl.appendChild(btn);
       });
@@ -1137,7 +1744,7 @@
       const hint = document.getElementById('selectedProductPriceHint');
       const prod = productsCatalog[key];
       if (prod) {
-        hint.textContent = `${prod.name} • Default Price: ${prod.price}`;
+        hint.textContent = `${prod.name} • Default Price: ${prod.price} SAR`;
       }
     }
 
@@ -1162,22 +1769,22 @@
       keys.forEach((key) => {
         const item = productsCatalog[key];
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5';
+        row.className = 'ye-subpanel flex items-center justify-between px-4 py-3';
         row.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="font-mono text-xs font-bold text-brand-400 bg-brand-500/10 border border-brand-500/20 px-2.5 py-1 rounded-lg">${escapeHtml(key)}</span>
+            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-lg ye-badge-blue">${escapeHtml(key)}</span>
             <div>
-              <div class="font-arabic text-sm font-semibold text-white">${escapeHtml(item.name)}</div>
-              <div class="text-xs font-mono text-emerald-400">Price: ${item.price}</div>
+              <div class="font-arabic text-sm font-bold" style="color: var(--text-primary);">${escapeHtml(item.name)}</div>
+              <div class="text-xs font-mono font-semibold" style="color: var(--success);">Price: ${item.price} SAR</div>
             </div>
           </div>
           <div class="flex items-center gap-1.5">
-            <button type="button" onclick="populateEditProduct('${escapeHtml(key)}')" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded hover:bg-slate-800 transition" title="Edit">
+            <button type="button" onclick="populateEditProduct('${escapeHtml(key)}')" class="text-xs px-2.5 py-1.5 rounded-lg ye-badge-neutral" title="Edit">
               <i class="fa-solid fa-pen"></i>
             </button>
             ${
               keys.length > 1
-                ? `<button type="button" onclick="deleteProductFromCatalog('${escapeHtml(key)}')" class="text-xs text-slate-400 hover:text-rose-400 px-2 py-1 rounded hover:bg-slate-800 transition" title="Delete">
+                ? `<button type="button" onclick="deleteProductFromCatalog('${escapeHtml(key)}')" class="text-xs px-2.5 py-1.5 rounded-lg ye-badge-danger" title="Delete">
                     <i class="fa-solid fa-trash"></i>
                   </button>`
                 : ''
@@ -1244,15 +1851,19 @@
       if (mode === 'single') {
         singlePanel.classList.remove('hidden');
         bulkPanel.classList.add('hidden');
-        singleBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow';
-        bulkBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60';
+        singleBtn.style.backgroundColor = 'var(--primary-blue)';
+        singleBtn.style.color = '#FFFFFF';
+        bulkBtn.style.backgroundColor = 'transparent';
+        bulkBtn.style.color = 'var(--text-secondary)';
         primaryBtnText.textContent = 'Generate & Add to List';
       } else {
         singlePanel.classList.add('hidden');
         bulkPanel.classList.remove('hidden');
-        bulkBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition bg-brand-600 text-white shadow';
-        singleBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition text-slate-400 hover:text-white hover:bg-slate-800/60';
-        primaryBtnText.textContent = 'Generate & Add All Bulk Orders';
+        bulkBtn.style.backgroundColor = 'var(--primary-blue)';
+        bulkBtn.style.color = '#FFFFFF';
+        singleBtn.style.backgroundColor = 'transparent';
+        singleBtn.style.color = 'var(--text-secondary)';
+        primaryBtnText.textContent = 'Generate & Add All Staged Orders';
       }
       handleLivePreview();
     }
@@ -1263,11 +1874,13 @@
       const rejBtn = document.getElementById('statusRejectedBtn');
 
       if (status === 'approved') {
-        appBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-emerald-600 text-white shadow';
-        rejBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white';
+        appBtn.className = 'py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition ye-badge-success';
+        rejBtn.className = 'py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition';
+        rejBtn.style.color = 'var(--text-secondary)';
       } else {
-        rejBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition bg-rose-600 text-white shadow';
-        appBtn.className = 'py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-white';
+        rejBtn.className = 'py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition ye-badge-danger';
+        appBtn.className = 'py-2.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition';
+        appBtn.style.color = 'var(--text-secondary)';
       }
       handleLivePreview();
     }
@@ -1279,10 +1892,10 @@
 
       if (enabled) {
         wrapper.classList.remove('opacity-40', 'pointer-events-none');
-        card.classList.add('border-amber-500/50', 'bg-amber-500/5');
+        card.style.borderColor = 'var(--warning)';
       } else {
         wrapper.classList.add('opacity-40', 'pointer-events-none');
-        card.classList.remove('border-amber-500/50', 'bg-amber-500/5');
+        card.style.borderColor = 'var(--border-color)';
       }
       handleLivePreview();
     }
@@ -1304,8 +1917,6 @@
      * 6. ORDER OBJECT CONSTRUCTION (EXACT FIELD ORDER)
      **************************************************************/
     function buildOrderObjectFromSpec(spec) {
-      // Exact key insertion order:
-      // id, productId, addedAt, status, [salePrice if editPrice], discountCode, commissionRate, warrantyDays
       const obj = {
         id: String(spec.id).trim(),
         productId: spec.productId,
@@ -1318,7 +1929,6 @@
         obj.salePrice = isNaN(numericSalePrice) ? 0 : numericSalePrice;
       }
 
-      // Always include a real Boolean. Missing values default to true.
       obj.discountCode = spec.discountCode !== false;
 
       const comm = Number(spec.commissionRate);
@@ -1330,126 +1940,83 @@
       return obj;
     }
 
-    function readCurrentFormSpec(overrideId = null, discountCodeOverride = true) {
-      const idVal = overrideId !== null
-        ? overrideId
-        : (document.getElementById('orderIdInput').value.trim() || '295332280');
+    function readCurrentFormSpec(overrideId = null, discountCodeOverride = true, overrideProductId = null) {
+  const idVal = overrideId !== null
+    ? overrideId
+    : (document.getElementById('orderIdInput').value.trim() || '295332280');
 
-      const productId = document.getElementById('productSelect').value || 'english';
-      const addedAt = document.getElementById('addedAtInput').value.trim() || getFormattedTimestampPlus3();
-      const editPrice = document.getElementById('editPriceToggle').checked;
-      const salePrice = Number(document.getElementById('salePriceInput').value || 0);
-      const commissionRate = Number(document.getElementById('commissionInput').value ?? 30);
-      const warrantyDays = Number(document.getElementById('warrantyInput').value ?? 14);
+  // Use the override product if provided, otherwise fallback to the current dropdown
+  const productId = overrideProductId !== null 
+    ? overrideProductId 
+    : (document.getElementById('productSelect').value || 'english');
+    
+  const addedAt = document.getElementById('addedAtInput').value.trim() || getFormattedTimestampPlus3();
+  const editPrice = document.getElementById('editPriceToggle').checked;
+  const salePrice = Number(document.getElementById('salePriceInput').value || 0);
+  const commissionRate = Number(document.getElementById('commissionInput').value ?? 30);
+  const warrantyDays = Number(document.getElementById('warrantyInput').value ?? 14);
 
-      return {
-        uid: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
-        id: idVal,
-        productId,
-        addedAt,
-        status: currentStatus,
-        discountCode: discountCodeOverride !== false,
-        editPrice,
-        salePrice,
-        commissionRate,
-        warrantyDays
-      };
-    }
+  return {
+    uid: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+    id: idVal,
+    productId,
+    addedAt,
+    status: currentStatus,
+    discountCode: discountCodeOverride !== false,
+    editPrice,
+    salePrice,
+    commissionRate,
+    warrantyDays
+  };
+}
 
     /**************************************************************
-     * 7. ADDING ORDERS TO QUEUE & BULK PARSING
+     * 7. ADDING ORDERS TO QUEUE & BULK COMMIT
      **************************************************************/
     function addOrderFromForm() {
-      if (document.getElementById('autoNowToggle').checked) {
-        refreshTimestampNow(false);
-      }
+  if (document.getElementById('autoNowToggle').checked) {
+    refreshTimestampNow(false);
+  }
 
-      const selectedProduct = document.getElementById('productSelect').value || 'english';
+  const selectedProduct = document.getElementById('productSelect').value || 'english';
 
-      if (currentEntryMode === 'single') {
-        const rawId = document.getElementById('orderIdInput').value.trim();
-
-        if (!rawId) {
-          showToast('Please enter a 9-digit Order Number (id) first', 'warning');
-          document.getElementById('orderIdInput').focus();
-          return;
-        }
-
-        if (!isValidNineDigitOrderId(rawId)) {
-          showToast(`Invalid Order ID "${rawId}" — Must be strictly 9 numeric digits!`, 'warning');
-          document.getElementById('orderIdInput').focus();
-          return;
-        }
-
-        if (isDuplicateOrderAndProduct(rawId, selectedProduct)) {
-          showToast(`Duplicate blocked: Order #${rawId} with product "${selectedProduct}" already exists!`, 'warning');
-          document.getElementById('orderIdInput').focus();
-          return;
-        }
-
-        const singleDiscountCode = document.getElementById('singleDiscountCodeSelect').value === 'true';
-        const spec = readCurrentFormSpec(rawId, singleDiscountCode);
-        orderQueue.push(spec);
-        orderQueue = sortOrdersNewestFirst(orderQueue);
-
-        // Clear Order ID input for fast sequential entry
-        const idInput = document.getElementById('orderIdInput');
-        idInput.value = '';
-        onSingleOrderIdInput(idInput);
-        idInput.focus();
-
-        renderOrderQueue();
-        handleLivePreview();
-        showToast(`Added Order #${spec.id} (${selectedProduct})`, 'success');
-      } else {
-        // Bulk mode with 9-digit validation & duplicate prevention
-        const rawBulk = document.getElementById('bulkIdsInput').value;
-        const tokens = rawBulk
-          .split(/[\n,\s]+/)
-          .map(s => s.trim())
-          .filter(Boolean);
-
-        if (tokens.length === 0) {
-          showToast('Please paste at least one 9-digit Order ID in Bulk mode', 'warning');
-          document.getElementById('bulkIdsInput').focus();
-          return;
-        }
-
-        const bulkDiscountCode = document.getElementById('bulkDiscountCodeSelect').value === 'true';
-        let addedCount = 0;
-        let invalidIds = [];
-        let duplicateIds = [];
-
-        tokens.forEach((token) => {
-          if (!isValidNineDigitOrderId(token)) {
-            invalidIds.push(token);
-            return;
-          }
-          if (isDuplicateOrderAndProduct(token, selectedProduct, orderQueue)) {
-            duplicateIds.push(token);
-            return;
-          }
-          orderQueue.push(readCurrentFormSpec(token, bulkDiscountCode));
-          addedCount++;
-        });
-
-        orderQueue = sortOrdersNewestFirst(orderQueue);
-
-        document.getElementById('bulkIdsInput').value = '';
-        onBulkInputUpdate();
-        renderOrderQueue();
-        handleLivePreview();
-
-        if (addedCount > 0 && invalidIds.length === 0 && duplicateIds.length === 0) {
-          showToast(`Added ${addedCount} valid orders (sorted newest first)`, 'success');
-        } else {
-          const summaryParts = [`Added: ${addedCount}`];
-          if (duplicateIds.length > 0) summaryParts.push(`Skipped ${duplicateIds.length} duplicate(s)`);
-          if (invalidIds.length > 0) summaryParts.push(`Skipped ${invalidIds.length} non-9-digit ID(s)`);
-          showToast(summaryParts.join(' • '), addedCount > 0 ? 'info' : 'warning');
-        }
-      }
+  if (currentEntryMode === 'single') {
+    // Act as an instructional fallback if clicked manually
+    showToast('Type a 9-digit Order ID above. The discount code popup will appear automatically.', 'info');
+    document.getElementById('orderIdInput').focus();
+  } else {
+    // Bulk Mode: Commit staged orders to main queue
+    if (bulkStagedOrders.length === 0) {
+      showToast('Type a 9-digit Order ID above first to choose its Discount Code (True / False)', 'warning');
+      document.getElementById('bulkIdsInput').focus();
+      return;
     }
+
+    let addedCount = 0;
+    let duplicateCount = 0;
+
+    bulkStagedOrders.forEach((staged) => {
+      if (isDuplicateOrderAndProduct(staged.id, staged.productId, orderQueue)) {
+        duplicateCount++;
+        return;
+      }
+      orderQueue.push(readCurrentFormSpec(staged.id, staged.discountCode, staged.productId));
+      addedCount++;
+    });
+
+    orderQueue = sortOrdersNewestFirst(orderQueue);
+    bulkStagedOrders = [];
+    renderBulkStagedOrders();
+    renderOrderQueue();
+    handleLivePreview();
+
+    if (addedCount > 0 && duplicateCount === 0) {
+      showToast(`Added ${addedCount} bulk order(s) to queue`, 'success');
+    } else {
+      showToast(`Added: ${addedCount} • Skipped ${duplicateCount} duplicate(s)`, addedCount > 0 ? 'info' : 'warning');
+    }
+  }
+}
 
     function generateInstantOnly() {
       if (currentEntryMode === 'single' && orderQueue.length === 0) {
@@ -1468,7 +2035,6 @@
     }
 
     function renderOrderQueue() {
-      // Always keep orderQueue sorted with newest addedAt dates on top
       orderQueue = sortOrdersNewestFirst(orderQueue);
 
       const container = document.getElementById('orderQueueContainer');
@@ -1482,12 +2048,12 @@
         clearBtn.classList.add('hidden');
         bulkPriceBtn.classList.add('hidden');
         container.innerHTML = `
-          <div class="text-center py-8 px-4 border border-dashed border-slate-800 rounded-xl bg-slate-950/40">
-            <div class="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto mb-2 text-slate-500">
-              <i class="fa-solid fa-bolt"></i>
+          <div class="text-center py-8 px-4 rounded-xl border border-dashed ye-subpanel">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ye-badge-blue">
+              <i class="fa-solid fa-layer-group"></i>
             </div>
-            <p class="text-xs font-medium text-slate-300">No queued orders yet — Live Preview shows current form</p>
-            <p class="text-[11px] text-slate-500 mt-1">Type an Order ID above and press <span class="text-slate-300 font-mono">Enter</span> or click <span class="text-brand-400">Generate &amp; Add to List</span> to build multiple orders.</p>
+            <p class="text-sm font-bold" style="color: var(--text-primary);">No queued orders yet — Live Preview shows current entry</p>
+            <p class="text-xs mt-1" style="color: var(--text-secondary);">Enter a 9-digit Order ID above to build single or bulk orders.</p>
           </div>
         `;
         return;
@@ -1502,33 +2068,36 @@
         const prodLabel = prod ? prod.name : item.productId;
 
         const card = document.createElement('div');
-        card.className = 'bg-slate-950/90 border border-slate-800/90 hover:border-slate-700 rounded-xl p-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 transition';
+        card.className = 'ye-subpanel p-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 transition';
         card.innerHTML = `
           <div class="flex items-center gap-3 min-w-0">
-            <span class="text-xs font-mono text-slate-500">#${index + 1}</span>
+            <span class="text-xs font-mono font-bold" style="color: var(--text-secondary);">#${index + 1}</span>
             <div>
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-mono text-sm font-bold text-white">${escapeHtml(item.id)}</span>
-                <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-500/15 text-brand-300 border border-brand-500/30">${escapeHtml(item.productId)}</span>
-                <span class="font-arabic text-xs text-slate-300" dir="rtl">${escapeHtml(prodLabel)}</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded ${
-                  item.status === 'approved'
-                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                <span class="font-mono text-sm font-extrabold" style="color: var(--text-primary);">${escapeHtml(item.id)}</span>
+                <span class="text-xs font-mono font-bold px-2 py-0.5 rounded ye-badge-blue">${escapeHtml(item.productId)}</span>
+                <span class="font-arabic text-xs font-bold" dir="rtl" style="color: var(--text-secondary);">${escapeHtml(prodLabel)}</span>
+                <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
+                  item.status === 'approved' ? 'ye-badge-success' : 'ye-badge-danger'
                 }">${item.status}</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded ${
-                  item.discountCode !== false
-                    ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
-                }">discountCode: ${item.discountCode !== false}</span>
+                <button
+                  type="button"
+                  onclick="toggleQueueItemDiscountCode(${index})"
+                  class="text-[11px] font-mono font-bold px-2 py-0.5 rounded transition ${
+                    item.discountCode !== false ? 'ye-badge-blue' : 'ye-badge-neutral'
+                  }"
+                  title="Click to toggle discountCode true/false"
+                >
+                  discountCode: ${item.discountCode !== false}
+                </button>
                 ${
                   item.editPrice
-                    ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">salePrice: ${item.salePrice}</span>`
+                    ? `<span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded ye-badge-warning">salePrice: ${item.salePrice}</span>`
                     : ''
                 }
               </div>
-              <div class="text-[11px] font-mono text-slate-500 mt-1">
-                ${escapeHtml(item.addedAt)} • comm: ${item.commissionRate} • warranty: ${item.warrantyDays}d
+              <div class="text-[11px] font-mono mt-1" style="color: var(--text-secondary);">
+                ${escapeHtml(item.addedAt)} • comm: ${item.commissionRate}% • warranty: ${item.warrantyDays}d
               </div>
             </div>
           </div>
@@ -1537,10 +2106,8 @@
             <button
               type="button"
               onclick="toggleQueueItemEditPrice(${index})"
-              class="text-xs px-2.5 py-1.5 rounded-lg border transition font-mono ${
-                item.editPrice
-                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+              class="text-xs px-2.5 py-1.5 rounded-lg font-mono font-bold transition ${
+                item.editPrice ? 'ye-badge-warning' : 'ye-badge-neutral'
               }"
               title="Toggle salePrice on this order"
             >
@@ -1549,7 +2116,7 @@
             <button
               type="button"
               onclick="toggleQueueItemStatus(${index})"
-              class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
+              class="text-xs px-2.5 py-1.5 rounded-lg ye-badge-neutral transition"
               title="Switch approved / rejected"
             >
               <i class="fa-solid fa-repeat"></i>
@@ -1557,7 +2124,7 @@
             <button
               type="button"
               onclick="removeOrderFromQueue(${index})"
-              class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-800 transition"
+              class="text-xs px-2.5 py-1.5 rounded-lg ye-badge-danger transition"
               title="Remove order"
             >
               <i class="fa-solid fa-xmark"></i>
@@ -1566,6 +2133,13 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    function toggleQueueItemDiscountCode(index) {
+      if (!orderQueue[index]) return;
+      orderQueue[index].discountCode = !(orderQueue[index].discountCode !== false);
+      renderOrderQueue();
+      handleLivePreview();
     }
 
     function toggleQueueItemEditPrice(index) {
@@ -1619,40 +2193,32 @@
       };
       Object.keys(btns).forEach((k) => {
         if (k === fmt) {
-          btns[k].className = 'px-2.5 py-1 rounded-lg transition bg-brand-600 text-white';
+          btns[k].style.backgroundColor = 'var(--primary-blue)';
+          btns[k].style.color = '#FFFFFF';
         } else {
-          btns[k].className = 'px-2.5 py-1 rounded-lg transition text-slate-400 hover:text-white';
+          btns[k].style.backgroundColor = 'transparent';
+          btns[k].style.color = 'var(--text-secondary)';
         }
       });
       handleLivePreview();
     }
 
     function getTargetOrderObjects() {
-      // If user has items in queue, sort them newest date first and generate from queue.
-      if (orderQueue.length > 0) {
-        const sortedQueue = sortOrdersNewestFirst(orderQueue);
-        return sortedQueue.map(buildOrderObjectFromSpec);
-      }
+  if (orderQueue.length > 0 && bulkStagedOrders.length === 0) {
+    const sortedQueue = sortOrdersNewestFirst(orderQueue);
+    return sortedQueue.map(buildOrderObjectFromSpec);
+  }
 
-      if (currentEntryMode === 'bulk') {
-        const rawBulk = document.getElementById('bulkIdsInput').value;
-        const ids = rawBulk
-          .split(/[\n,\s]+/)
-          .map(s => s.trim())
-          .filter(isValidNineDigitOrderId);
+  if (currentEntryMode === 'bulk' && bulkStagedOrders.length > 0) {
+    // Correctly map the productId attached to each staged order for the live preview
+    const stagedSpecs = bulkStagedOrders.map(item => readCurrentFormSpec(item.id, item.discountCode, item.productId));
+    const combined = [...orderQueue, ...stagedSpecs];
+    return sortOrdersNewestFirst(combined).map(buildOrderObjectFromSpec);
+  }
 
-        // Deduplicate within preview batch for the selected product
-        const uniqueIds = [...new Set(ids)];
-        if (uniqueIds.length > 0) {
-          const bulkDiscountCode = document.getElementById('bulkDiscountCodeSelect').value === 'true';
-          const specs = uniqueIds.map(idStr => readCurrentFormSpec(idStr, bulkDiscountCode));
-          return sortOrdersNewestFirst(specs).map(buildOrderObjectFromSpec);
-        }
-      }
-
-      const singleDiscountCode = document.getElementById('singleDiscountCodeSelect').value === 'true';
-      return [buildOrderObjectFromSpec(readCurrentFormSpec(null, singleDiscountCode))];
-    }
+  const singleDiscountCode = document.getElementById('singleDiscountCodeSelect').value === 'true';
+  return [buildOrderObjectFromSpec(readCurrentFormSpec(null, singleDiscountCode, null))];
+}
 
     function formatOrderObjectsToString(objects) {
       if (outputFormat === 'array') {
@@ -1666,7 +2232,6 @@
         return objects.map(o => JSON.stringify(o, null, 2)).join(',\n');
       }
 
-      // Default 'snippet' format: matches user's example `{ ... },` with trailing comma
       return objects.map(o => `${JSON.stringify(o, null, 2)},`).join('\n');
     }
 
@@ -1703,11 +2268,17 @@
       rawEl.value = formattedCode;
 
       const count = objects.length;
-      const sourceLabel = orderQueue.length > 0 ? 'from Queued List' : 'Live Form Preview';
+      let sourceLabel = 'Live Form Preview';
+      if (orderQueue.length > 0 && bulkStagedOrders.length > 0) {
+        sourceLabel = 'Queue + Staged Bulk';
+      } else if (orderQueue.length > 0) {
+        sourceLabel = 'from Queued List';
+      } else if (currentEntryMode === 'bulk' && bulkStagedOrders.length > 0) {
+        sourceLabel = 'from Staged Bulk Orders';
+      }
+
       statsEl.textContent = `${count} ${count === 1 ? 'order' : 'orders'} • ${sourceLabel}`;
-      subtextEl.textContent = orderQueue.length > 0
-        ? `Showing ${count} queued ${count === 1 ? 'order' : 'orders'}`
-        : 'Live preview from form inputs above';
+      subtextEl.textContent = `${count} ${count === 1 ? 'order' : 'orders'} ready (${sourceLabel})`;
     }
 
     function toggleRawTextView() {
@@ -1785,9 +2356,7 @@
             return;
           }
         }
-      } catch (_) {
-        // Fallback if iframe blocks clipboard read
-      }
+      } catch (_) {}
       input.focus();
       showToast('Press Ctrl+V / Cmd+V to paste Order ID', 'info');
     }
@@ -1815,7 +2384,8 @@
       idInput.value = '';
       onSingleOrderIdInput(idInput);
       document.getElementById('bulkIdsInput').value = '';
-      onBulkInputUpdate();
+      bulkStagedOrders = [];
+      renderBulkStagedOrders();
       selectProductKey('english');
       setOrderStatus('approved');
       document.getElementById('editPriceToggle').checked = false;
@@ -1843,21 +2413,23 @@
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
 
-      const colorMap = {
-        success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
-        warning: 'bg-amber-950/95 border-amber-500/40 text-amber-200',
-        info: 'bg-slate-900/95 border-slate-700 text-slate-200'
+      const badgeMap = {
+        success: 'ye-badge-success',
+        warning: 'ye-badge-warning',
+        info: 'ye-badge-blue'
       };
       const iconMap = {
-        success: 'fa-circle-check text-emerald-400',
-        warning: 'fa-triangle-exclamation text-amber-400',
-        info: 'fa-circle-info text-brand-400'
+        success: 'fa-circle-check',
+        warning: 'fa-triangle-exclamation',
+        info: 'fa-circle-info'
       };
 
-      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-xl border shadow-xl text-xs font-medium backdrop-blur-md transition-all duration-300 ${colorMap[type] || colorMap.info}`;
+      toast.className = `pointer-events-auto ye-card px-4 py-3 flex items-center gap-2.5 text-xs sm:text-sm font-bold shadow-lg transition-all duration-300`;
       toast.innerHTML = `
-        <i class="fa-solid ${iconMap[type] || iconMap.info}"></i>
-        <span>${escapeHtml(message)}</span>
+        <span class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${badgeMap[type] || badgeMap.info}">
+          <i class="fa-solid ${iconMap[type] || iconMap.info}"></i>
+        </span>
+        <span style="color: var(--text-primary);">${escapeHtml(message)}</span>
       `;
 
       container.appendChild(toast);
