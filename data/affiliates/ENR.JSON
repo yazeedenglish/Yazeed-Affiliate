@@ -1,0 +1,42 @@
+{
+    "code": "ENR",
+    "password": "EN123456",
+    "name": "ENR",
+    "active": true,
+    "couponCode": "ENR",
+    "orders": [
+
+
+{
+  "id": "297755340",
+  "productId": "english",
+  "addedAt": "2026-11-03T10:46:48+03:00",
+  "status": "approved",
+  "discountCode": false,
+  "commissionRate": 30,
+  "warrantyDays": 14
+},
+{
+  "id": "297055931",
+  "productId": "english",
+  "addedAt": "2026-10-31T10:46:48+03:00",
+  "status": "approved",
+  "discountCode": false,
+  "commissionRate": 30,
+  "warrantyDays": 14
+},
+{
+  "id": "297055931",
+  "productId": "trab6",
+  "addedAt": "2026-10-31T10:46:48+03:00",
+  "status": "approved",
+  "discountCode": false,
+  "commissionRate": 30,
+  "warrantyDays": 14
+}
+
+
+
+
+        ]
+}
